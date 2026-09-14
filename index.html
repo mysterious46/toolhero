@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <script>
+      // Automatic HTTPS Enforcer: Instantly redirect plain HTTP traffic to Secure HTTPS
+      if (window.location.protocol === 'http:' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+        window.location.replace('https://' + window.location.host + window.location.pathname + window.location.search + window.location.hash);
+      }
+    </script>
+    <!-- Google AdSense Official Tag -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2691426644583765" crossorigin="anonymous"></script>
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#c45d3e" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="google-site-verification" content="c7GD050p-UW5mm7YrbvAc0k-yc6y-gdVOxG1FIamWL0" />
+
+    <!-- Primary Meta Tags -->
+    <title>ToolHero - Free Online PDF, Image, Text & Security Utilities</title>
+    <meta name="title" content="ToolHero - Free Online PDF, Image, Text & Security Utilities" />
+    <meta name="description" content="36+ free in-browser online tools to compress images, trim audio, convert video to GIF, manage PDFs, audit hashes, create QR codes, and format code. 100% private and client-side." />
+    <meta name="keywords" content="pdf compressor, passport photo maker, qr code generator, audio trimmer, video to gif, jwt decoder, hash identifier, word counter, json formatter, free online tools, toolhero" />
+    <meta name="author" content="ToolHero" />
+
+    <!-- Open Graph / Facebook / WhatsApp -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="ToolHero" />
+    <meta property="og:title" content="ToolHero - Free In-Browser Online Utilities" />
+    <meta property="og:description" content="Free online tools for PDF, image, text, security, audio, video, and developer utilities. ToolHero processes everything in your browser — 100% private." />
+
+    <!-- Twitter Card -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:title" content="ToolHero - Free In-Browser Online Utilities" />
+    <meta property="twitter:description" content="Free online tools for PDF, image, text, security, audio, video, and developer utilities. 100% private." />
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@500;700;800&display=swap" rel="stylesheet">
+
+    <!-- PWA Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+          navigator.serviceWorker.register('/sw.js').catch(function() {});
+        });
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

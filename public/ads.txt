@@ -1,0 +1,2 @@
+# Google AdSense Publisher Verification File for ToolHero
+google.com, pub-2691426644583765, DIRECT, f08c47fec0942fa0

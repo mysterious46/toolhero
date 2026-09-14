@@ -1,0 +1,17 @@
+{
+  "name": "ToolHero - Free In-Browser Online Utilities",
+  "short_name": "ToolHero",
+  "description": "36+ free in-browser online tools to compress images, trim audio, convert video to GIF, manage PDFs, audit hashes, create QR codes, and format code. 100% private and offline-capable.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#faf9f7",
+  "theme_color": "#c45d3e",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
