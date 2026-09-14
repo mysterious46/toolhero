@@ -2,69 +2,70 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://toolhero.xyz/</loc>
+    <lastmod>2026-09-14</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
 
   <!-- PDF Tools -->
-  <url><loc>https://toolhero.xyz/pdf</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://toolhero.xyz/pdf/compress-pdf</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://toolhero.xyz/pdf/merge-pdf</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://toolhero.xyz/pdf/split-pdf</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://toolhero.xyz/pdf/pdf-to-images</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://toolhero.xyz/pdf/images-to-pdf</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://toolhero.xyz/pdf/rotate-pdf</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://toolhero.xyz/pdf/watermark-pdf</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://toolhero.xyz/pdf/reorder-pages</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://toolhero.xyz/pdf/extract-pdf-text</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://toolhero.xyz/pdf/word-to-pdf</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://toolhero.xyz/pdf/pdf-to-word</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://toolhero.xyz/pdf</loc><lastmod>2026-09-14</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://toolhero.xyz/pdf/compress-pdf</loc><lastmod>2026-09-14</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://toolhero.xyz/pdf/merge-pdf</loc><lastmod>2026-09-14</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://toolhero.xyz/pdf/split-pdf</loc><lastmod>2026-09-14</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://toolhero.xyz/pdf/pdf-to-images</loc><lastmod>2026-09-14</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://toolhero.xyz/pdf/images-to-pdf</loc><lastmod>2026-09-14</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://toolhero.xyz/pdf/rotate-pdf</loc><lastmod>2026-09-14</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://toolhero.xyz/pdf/watermark-pdf</loc><lastmod>2026-09-14</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://toolhero.xyz/pdf/reorder-pages</loc><lastmod>2026-09-14</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://toolhero.xyz/pdf/extract-pdf-text</loc><lastmod>2026-09-14</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://toolhero.xyz/pdf/word-to-pdf</loc><lastmod>2026-09-14</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://toolhero.xyz/pdf/pdf-to-word</loc><lastmod>2026-09-14</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
 
   <!-- Image Tools -->
-  <url><loc>https://toolhero.xyz/image</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://toolhero.xyz/image/passport-photo</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://toolhero.xyz/image/compress-image</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://toolhero.xyz/image/remove-bg</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://toolhero.xyz/image/resize-image</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://toolhero.xyz/image/crop-image</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://toolhero.xyz/image/convert-format</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://toolhero.xyz/image/favicon-generator</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://toolhero.xyz/image/meme-generator</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://toolhero.xyz/image/color-palette</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://toolhero.xyz/image/rotate-flip</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://toolhero.xyz/image/watermark-image</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://toolhero.xyz/image/blur-image</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://toolhero.xyz/image</loc><lastmod>2026-09-14</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://toolhero.xyz/image/passport-photo</loc><lastmod>2026-09-14</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://toolhero.xyz/image/compress-image</loc><lastmod>2026-09-14</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://toolhero.xyz/image/remove-bg</loc><lastmod>2026-09-14</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://toolhero.xyz/image/resize-image</loc><lastmod>2026-09-14</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://toolhero.xyz/image/crop-image</loc><lastmod>2026-09-14</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://toolhero.xyz/image/convert-format</loc><lastmod>2026-09-14</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://toolhero.xyz/image/favicon-generator</loc><lastmod>2026-09-14</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://toolhero.xyz/image/meme-generator</loc><lastmod>2026-09-14</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://toolhero.xyz/image/color-palette</loc><lastmod>2026-09-14</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://toolhero.xyz/image/rotate-flip</loc><lastmod>2026-09-14</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://toolhero.xyz/image/watermark-image</loc><lastmod>2026-09-14</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://toolhero.xyz/image/blur-image</loc><lastmod>2026-09-14</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
 
   <!-- Text & Dev Tools -->
-  <url><loc>https://toolhero.xyz/text</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://toolhero.xyz/text/word-counter</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://toolhero.xyz/text/password-generator</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://toolhero.xyz/text/diff-checker</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://toolhero.xyz/text/case-converter</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://toolhero.xyz/text</loc><lastmod>2026-09-14</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://toolhero.xyz/text/word-counter</loc><lastmod>2026-09-14</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://toolhero.xyz/text/password-generator</loc><lastmod>2026-09-14</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://toolhero.xyz/text/diff-checker</loc><lastmod>2026-09-14</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://toolhero.xyz/text/case-converter</loc><lastmod>2026-09-14</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
 
   <!-- Security Tools -->
-  <url><loc>https://toolhero.xyz/security</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://toolhero.xyz/security/hash-identifier</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://toolhero.xyz/security/jwt-decoder</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://toolhero.xyz/security/crypto-studio</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://toolhero.xyz/security/password-analyzer</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://toolhero.xyz/security/rsa-generator</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://toolhero.xyz/security/ip-calculator</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://toolhero.xyz/security</loc><lastmod>2026-09-14</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://toolhero.xyz/security/hash-identifier</loc><lastmod>2026-09-14</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://toolhero.xyz/security/jwt-decoder</loc><lastmod>2026-09-14</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://toolhero.xyz/security/crypto-studio</loc><lastmod>2026-09-14</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://toolhero.xyz/security/password-analyzer</loc><lastmod>2026-09-14</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://toolhero.xyz/security/rsa-generator</loc><lastmod>2026-09-14</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://toolhero.xyz/security/ip-calculator</loc><lastmod>2026-09-14</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
 
   <!-- Audio & Video -->
-  <url><loc>https://toolhero.xyz/media</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://toolhero.xyz/media/audio-trimmer</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://toolhero.xyz/media/video-to-gif</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://toolhero.xyz/media/extract-audio</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://toolhero.xyz/media</loc><lastmod>2026-09-14</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://toolhero.xyz/media/audio-trimmer</loc><lastmod>2026-09-14</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://toolhero.xyz/media/video-to-gif</loc><lastmod>2026-09-14</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://toolhero.xyz/media/extract-audio</loc><lastmod>2026-09-14</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
 
   <!-- Other Tools -->
-  <url><loc>https://toolhero.xyz/other</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://toolhero.xyz/other/qr-code</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://toolhero.xyz/other/json-formatter</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://toolhero.xyz/other</loc><lastmod>2026-09-14</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://toolhero.xyz/other/qr-code</loc><lastmod>2026-09-14</lastmod><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://toolhero.xyz/other/json-formatter</loc><lastmod>2026-09-14</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
 
   <!-- Trust & Policy Pages -->
-  <url><loc>https://toolhero.xyz/about</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://toolhero.xyz/contact</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://toolhero.xyz/privacy</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://toolhero.xyz/terms</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://toolhero.xyz/about</loc><lastmod>2026-09-14</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://toolhero.xyz/contact</loc><lastmod>2026-09-14</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://toolhero.xyz/privacy</loc><lastmod>2026-09-14</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://toolhero.xyz/terms</loc><lastmod>2026-09-14</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
 </urlset>

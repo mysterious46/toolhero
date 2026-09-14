@@ -13,32 +13,52 @@
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="manifest" href="/manifest.json" />
+    <link rel="canonical" href="https://toolhero.xyz/" />
     <meta name="theme-color" content="#c45d3e" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="google-site-verification" content="c7GD050p-UW5mm7YrbvAc0k-yc6y-gdVOxG1FIamWL0" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
 
     <!-- Primary Meta Tags -->
-    <title>ToolHero - Free Online PDF, Image, Text & Security Utilities</title>
-    <meta name="title" content="ToolHero - Free Online PDF, Image, Text & Security Utilities" />
+    <title>ToolHero – Free Online PDF, Image, Video & More Tools</title>
+    <meta name="title" content="ToolHero – Free Online PDF, Image, Video & More Tools" />
     <meta name="description" content="36+ free in-browser online tools to compress images, trim audio, convert video to GIF, manage PDFs, audit hashes, create QR codes, and format code. 100% private and client-side." />
-    <meta name="keywords" content="pdf compressor, passport photo maker, qr code generator, audio trimmer, video to gif, jwt decoder, hash identifier, word counter, json formatter, free online tools, toolhero" />
+    <meta name="keywords" content="pdf compressor, passport photo maker, qr code generator, audio trimmer, video to gif, jwt decoder, hash identifier, word counter, json formatter, word to pdf, pdf to word, free online tools, toolhero" />
     <meta name="author" content="ToolHero" />
 
     <!-- Open Graph / Facebook / WhatsApp -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="ToolHero" />
-    <meta property="og:title" content="ToolHero - Free In-Browser Online Utilities" />
+    <meta property="og:title" content="ToolHero – Free In-Browser Online Utilities" />
     <meta property="og:description" content="Free online tools for PDF, image, text, security, audio, video, and developer utilities. ToolHero processes everything in your browser — 100% private." />
+    <meta property="og:url" content="https://toolhero.xyz/" />
+    <meta property="og:image" content="https://toolhero.xyz/favicon.svg" />
 
     <!-- Twitter Card -->
     <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:title" content="ToolHero - Free In-Browser Online Utilities" />
+    <meta property="twitter:title" content="ToolHero – Free In-Browser Online Utilities" />
     <meta property="twitter:description" content="Free online tools for PDF, image, text, security, audio, video, and developer utilities. 100% private." />
 
     <!-- Google Web Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@500;700;800&display=swap" rel="stylesheet">
+
+    <!-- Structured Data: WebSite + SiteNavigationElement -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "ToolHero",
+      "url": "https://toolhero.xyz/",
+      "description": "36+ free in-browser online tools for PDF, image, text, security, audio, and video. 100% private and client-side.",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://toolhero.xyz/?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    }
+    </script>
 
     <!-- PWA Service Worker Registration -->
     <script>
@@ -51,6 +71,67 @@
   </head>
   <body>
     <div id="root"></div>
+    <!-- SEO Fallback: Googlebot sees this content when JS rendering is delayed -->
+    <noscript>
+      <h1>ToolHero – Free Online PDF, Image, Video & More Tools</h1>
+      <p>36+ free in-browser tools. 100% private, no uploads to any server.</p>
+      <h2>PDF Tools</h2>
+      <ul>
+        <li><a href="/pdf/compress-pdf">Compress PDF</a></li>
+        <li><a href="/pdf/merge-pdf">Merge PDF</a></li>
+        <li><a href="/pdf/split-pdf">Split PDF</a></li>
+        <li><a href="/pdf/pdf-to-images">PDF to JPG</a></li>
+        <li><a href="/pdf/images-to-pdf">JPG to PDF</a></li>
+        <li><a href="/pdf/word-to-pdf">Word to PDF</a></li>
+        <li><a href="/pdf/pdf-to-word">PDF to Word</a></li>
+        <li><a href="/pdf/rotate-pdf">Rotate PDF</a></li>
+        <li><a href="/pdf/watermark-pdf">Watermark PDF</a></li>
+        <li><a href="/pdf/reorder-pages">Reorder PDF Pages</a></li>
+        <li><a href="/pdf/extract-pdf-text">Extract PDF Text</a></li>
+      </ul>
+      <h2>Image Tools</h2>
+      <ul>
+        <li><a href="/image/compress-image">Compress Image</a></li>
+        <li><a href="/image/resize-image">Resize Image</a></li>
+        <li><a href="/image/crop-image">Crop Image</a></li>
+        <li><a href="/image/remove-bg">Remove Background</a></li>
+        <li><a href="/image/convert-format">Image Converter</a></li>
+        <li><a href="/image/passport-photo">Passport Photo Maker</a></li>
+        <li><a href="/image/favicon-generator">Favicon Generator</a></li>
+        <li><a href="/image/meme-generator">Meme Generator</a></li>
+        <li><a href="/image/color-palette">Color Palette Generator</a></li>
+        <li><a href="/image/watermark-image">Watermark Image</a></li>
+        <li><a href="/image/blur-image">Blur Image</a></li>
+        <li><a href="/image/rotate-flip">Rotate & Flip Image</a></li>
+      </ul>
+      <h2>Text & Dev Tools</h2>
+      <ul>
+        <li><a href="/text/word-counter">Word Counter</a></li>
+        <li><a href="/text/password-generator">Password Generator</a></li>
+        <li><a href="/text/diff-checker">Text Diff Checker</a></li>
+        <li><a href="/text/case-converter">Case Converter</a></li>
+      </ul>
+      <h2>Security & Crypto</h2>
+      <ul>
+        <li><a href="/security/hash-identifier">Hash Identifier</a></li>
+        <li><a href="/security/crypto-studio">Encryption / Decryption</a></li>
+        <li><a href="/security/password-analyzer">Password Strength Checker</a></li>
+        <li><a href="/security/jwt-decoder">JWT Decoder</a></li>
+        <li><a href="/security/rsa-generator">RSA Key Generator</a></li>
+        <li><a href="/security/ip-calculator">IPv4 Subnet Calculator</a></li>
+      </ul>
+      <h2>Audio & Video</h2>
+      <ul>
+        <li><a href="/media/audio-trimmer">Audio Trimmer</a></li>
+        <li><a href="/media/video-to-gif">Video to GIF</a></li>
+        <li><a href="/media/extract-audio">Extract Audio from Video</a></li>
+      </ul>
+      <h2>Other Tools</h2>
+      <ul>
+        <li><a href="/other/qr-code">QR Code Generator</a></li>
+        <li><a href="/other/json-formatter">JSON Formatter</a></li>
+      </ul>
+    </noscript>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
