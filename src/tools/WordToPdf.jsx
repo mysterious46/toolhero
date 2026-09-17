@@ -86,6 +86,7 @@ export default function WordToPdf() {
         await docxPreview.renderAsync(arrayBuf, containerRef.current, null, {
           className: 'docx',
           inWrapper: true,
+          hideWrapperOnPrint: true,
           ignoreWidth: false,
           ignoreHeight: false,
           ignoreFonts: false,
@@ -266,34 +267,48 @@ export default function WordToPdf() {
           <style>
             @page {
               size: A4 portrait;
-              margin: 0; /* Suppresses browser URL headers and footers */
+              margin: 0mm !important;
             }
             * {
               -webkit-print-color-adjust: exact !important;
               print-color-adjust: exact !important;
             }
-            body {
+            html, body {
               margin: 0 !important;
               padding: 0 !important;
               background: white !important;
               font-family: Aptos, Calibri, "Segoe UI", -apple-system, BlinkMacSystemFont, Arial, sans-serif !important;
             }
             .docx-wrapper {
-              background: white !important;
+              background: transparent !important;
               padding: 0 !important;
-              box-shadow: none !important;
               margin: 0 !important;
+              box-shadow: none !important;
             }
-            section.docx, section {
+            .docx-wrapper > section.docx,
+            section.docx,
+            section {
               box-shadow: none !important;
               border: none !important;
               margin: 0 auto !important;
-              padding: 16mm 14mm !important;
+              margin-bottom: 0 !important;
+              min-height: 0 !important;
+              max-height: 296mm !important; /* Stays strictly within 1 A4 sheet, eliminating alternating blank pages */
               background: white !important;
-              max-width: 100% !important;
               box-sizing: border-box !important;
+              overflow: hidden !important;
+              page-break-inside: avoid !important;
+              break-inside: avoid !important;
+              page-break-after: always !important;
+              break-after: page !important;
             }
-            /* Prevent chopping text lines, headings, list items, and tables */
+            .docx-wrapper > section.docx:last-child,
+            section.docx:last-child,
+            section:last-child {
+              page-break-after: avoid !important;
+              break-after: avoid !important;
+            }
+            /* Protect headings, list items, and table cells */
             p, h1, h2, h3, h4, h5, h6, li, tr, blockquote, figure,
             div[style*="border"], div[style*="background"], div[class*="box"], div[class*="card"] {
               page-break-inside: avoid !important;
@@ -310,15 +325,6 @@ export default function WordToPdf() {
             tr, td, th {
               page-break-inside: avoid !important;
               break-inside: avoid !important;
-            }
-            @media print {
-              body { padding: 0 !important; }
-              section.docx, section {
-                margin: 0 !important;
-                box-shadow: none !important;
-                page-break-after: always;
-                break-after: page;
-              }
             }
           </style>
         </head>
