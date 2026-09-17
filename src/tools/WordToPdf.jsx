@@ -2,42 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import { FileText, Download, RefreshCw, Eye, ZoomIn, ZoomOut, Printer, CheckCircle2, Sparkles } from 'lucide-react';
 import AdBanner from '../components/AdBanner';
 
-/**
- * Finds the nearest horizontal blank row (white space) near idealCutY
- * so we never cut through a line of text, table, or box.
- */
-function findSafeCutY(ctx, canvasWidth, idealCutY, lookback = 150) {
-  const minY = Math.max(0, idealCutY - lookback);
-  const scanH = idealCutY - minY;
-  if (scanH <= 0) return idealCutY;
-
-  try {
-    const data = ctx.getImageData(0, minY, canvasWidth, scanH).data;
-    // Walk upwards from idealCutY towards minY
-    for (let r = scanH - 1; r >= 0; r--) {
-      let isRowBlank = true;
-      const rowOffset = r * canvasWidth * 4;
-      for (let c = 0; c < canvasWidth; c += 8) { // sample every 8px
-        const idx = rowOffset + c * 4;
-        const red = data[idx];
-        const green = data[idx + 1];
-        const blue = data[idx + 2];
-        // If not white / near-white background
-        if (red < 242 || green < 242 || blue < 242) {
-          isRowBlank = false;
-          break;
-        }
-      }
-      if (isRowBlank) {
-        return minY + r;
-      }
-    }
-  } catch (e) {
-    console.warn('Blank space detection error:', e);
-  }
-  return idealCutY;
-}
-
 export default function WordToPdf() {
   const [file, setFile] = useState(null);
   const [arrayBuf, setArrayBuf] = useState(null);
@@ -102,21 +66,20 @@ export default function WordToPdf() {
         });
 
         if (!cancelled) {
-          // Calculate realistic page count based on A4 aspect ratio (297/210 ≈ 1.414)
           const sections = containerRef.current.querySelectorAll('section');
-          let estimatedPages = 0;
-          sections.forEach(s => {
-            const h = s.offsetHeight || 0;
-            const w = s.offsetWidth || 794;
-            const sub = Math.max(1, Math.ceil((h - 20) / (w * 1.414)));
-            estimatedPages += sub;
-          });
-          setPageCount(estimatedPages || (sections.length || 1));
+          let count = sections.length;
+          if (!count) {
+            // Continuous single section estimation
+            const h = containerRef.current.offsetHeight || 0;
+            const w = containerRef.current.offsetWidth || 794;
+            count = Math.max(1, Math.ceil((h - 20) / (w * 1.414)));
+          }
+          setPageCount(count);
           setRendered(true);
         }
       } catch (err) {
         console.error('DOCX render error:', err);
-        if (!cancelled) alert('Failed to render the document. Make sure it\'s a valid .docx file: ' + (err.message || ''));
+        if (!cancelled) alert('Failed to render the document: ' + (err.message || ''));
       } finally {
         if (!cancelled) setBusy(false);
       }
@@ -125,31 +88,30 @@ export default function WordToPdf() {
     return () => { cancelled = true; };
   }, [arrayBuf]);
 
+  /**
+   * Direct high-resolution PDF generation (1-click download)
+   */
   const convertToPdf = async () => {
     if (!rendered || !containerRef.current) return;
     setConverting(true);
-    setProgressMsg('Preparing document pages...');
+    setProgressMsg('Preparing high-res document capture...');
 
     const origTransform = containerRef.current.style.transform;
 
     try {
-      // Temporarily reset preview zoom for high-res capture
       containerRef.current.style.transform = 'none';
 
-      // Find all sections or pages rendered by docx-preview
-      let sections = Array.from(containerRef.current.querySelectorAll('section'));
+      // Find all rendered page sections
+      let sections = Array.from(containerRef.current.querySelectorAll('section.docx, section'));
       if (!sections.length) {
-        sections = Array.from(containerRef.current.querySelectorAll('.docx-wrapper > *, [class*="docx-wrapper"] > *'));
-      }
-      if (!sections.length) {
-        sections = Array.from(containerRef.current.querySelectorAll('.docx, [class*="docx"]'));
+        sections = Array.from(containerRef.current.querySelectorAll('.docx-wrapper > *'));
       }
       if (!sections.length && containerRef.current.children.length) {
         sections = Array.from(containerRef.current.children);
       }
 
       if (!sections.length) {
-        alert('No rendered pages found to convert. Please try reloading your file.');
+        alert('No rendered pages found to convert.');
         setConverting(false);
         containerRef.current.style.transform = origTransform;
         return;
@@ -159,22 +121,20 @@ export default function WordToPdf() {
       const { jsPDF } = await import('jspdf');
 
       const A4_WIDTH_MM = 210;
-      const A4_HEIGHT_MM = 297;
-      const A4_RATIO = A4_HEIGHT_MM / A4_WIDTH_MM; // ~1.4142
-
       const pdf = new jsPDF({
         orientation: 'portrait',
         unit: 'mm',
         format: 'a4',
       });
+
       let isFirstPage = true;
 
       for (let i = 0; i < sections.length; i++) {
         const section = sections[i];
-        setProgressMsg(`Processing document section ${i + 1} of ${sections.length}...`);
+        setProgressMsg(`Capturing page ${i + 1} of ${sections.length} (Ultra-HD)...`);
 
         const canvas = await html2canvas(section, {
-          scale: 2, // 2x high resolution
+          scale: 2, // 2x crisp high-res
           useCORS: true,
           allowTaint: true,
           backgroundColor: '#ffffff',
@@ -183,59 +143,23 @@ export default function WordToPdf() {
           scrollY: 0,
         });
 
-        const ctx = canvas.getContext('2d', { willReadFrequently: true });
-        const idealPageH = canvas.width * A4_RATIO;
+        const pageHeightMm = (canvas.height / canvas.width) * A4_WIDTH_MM;
 
-        if (canvas.height <= idealPageH + 15) {
-          // Fits on single A4 page
-          if (!isFirstPage) pdf.addPage('a4', 'portrait');
-          isFirstPage = false;
-          pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, A4_WIDTH_MM, (canvas.height / canvas.width) * A4_WIDTH_MM);
-        } else {
-          // Multi-page continuous section: smart content-aware page slicing
-          let currentY = 0;
-          let subPageIndex = 1;
-
-          while (currentY < canvas.height - 10) {
-            setProgressMsg(`Slicing page ${subPageIndex} (content-aware)...`);
-            const remainingH = canvas.height - currentY;
-            let sliceH = Math.min(idealPageH, remainingH);
-
-            if (remainingH > idealPageH) {
-              // Find safe horizontal whitespace so text lines and tables are NEVER chopped
-              const safeCutY = findSafeCutY(ctx, canvas.width, currentY + idealPageH, 160);
-              sliceH = safeCutY - currentY;
-              if (sliceH <= 100) {
-                // Fallback if no white space found
-                sliceH = idealPageH;
-              }
-            }
-
-            const sliceCanvas = document.createElement('canvas');
-            sliceCanvas.width = canvas.width;
-            sliceCanvas.height = idealPageH; // Keep standard A4 proportions
-            const sCtx = sliceCanvas.getContext('2d');
-            sCtx.fillStyle = '#ffffff';
-            sCtx.fillRect(0, 0, sliceCanvas.width, sliceCanvas.height);
-            sCtx.drawImage(canvas, 0, currentY, canvas.width, sliceH, 0, 0, canvas.width, sliceH);
-
-            if (!isFirstPage) pdf.addPage('a4', 'portrait');
-            isFirstPage = false;
-
-            pdf.addImage(sliceCanvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, A4_WIDTH_MM, A4_HEIGHT_MM);
-
-            currentY += sliceH;
-            subPageIndex++;
-          }
+        if (!isFirstPage) {
+          pdf.addPage([A4_WIDTH_MM, pageHeightMm], pageHeightMm > A4_WIDTH_MM ? 'portrait' : 'landscape');
         }
+        isFirstPage = false;
+
+        pdf.addImage(canvas.toDataURL('image/jpeg', 0.98), 'JPEG', 0, 0, A4_WIDTH_MM, pageHeightMm);
       }
 
+      setProgressMsg('Finalizing and saving PDF...');
       const outName = (file?.name || 'document').replace(/\.docx$/i, '') + '.pdf';
       pdf.save(outName);
-      setProgressMsg('Done! Downloading PDF...');
+      setProgressMsg('Done! PDF downloaded.');
     } catch (err) {
       console.error('PDF conversion error:', err);
-      alert('PDF conversion failed: ' + (err.message || 'Please try again.'));
+      alert('PDF generation failed: ' + (err.message || 'Please try again.'));
     } finally {
       if (containerRef.current) {
         containerRef.current.style.transform = origTransform;
@@ -245,10 +169,12 @@ export default function WordToPdf() {
     }
   };
 
+  /**
+   * Native vector print export using invisible background iframe
+   */
   const printDocument = () => {
     if (!containerRef.current) return;
 
-    // Use an invisible iframe so NO 'about:blank' tab ever opens or stays behind
     let iframe = document.getElementById('docx-print-frame');
     if (iframe) iframe.remove();
 
@@ -279,7 +205,7 @@ export default function WordToPdf() {
           <style>
             @page {
               size: A4 portrait;
-              margin: 12mm 10mm;
+              margin: 0mm !important;
             }
             * {
               -webkit-print-color-adjust: exact !important;
@@ -306,34 +232,34 @@ export default function WordToPdf() {
             section {
               box-shadow: none !important;
               border: none !important;
-              margin: 0 !important;
-              padding: 0 !important;
+              margin: 0 auto !important;
+              margin-bottom: 0 !important;
               width: 100% !important;
               max-width: 100% !important;
-              min-height: auto !important;
+              min-height: 0 !important; /* Cancels 297mm inline style that causes 2nd blank page */
               height: auto !important;
               max-height: none !important;
               background: white !important;
               box-sizing: border-box !important;
               overflow: visible !important;
+              display: block !important; /* CRITICAL: Must be block (NOT flex) so Chrome paginates every page */
+              page-break-inside: avoid !important;
+              break-inside: avoid !important;
+              page-break-after: always !important;
+              break-after: page !important;
             }
-            /* Protect headings and table rows from being split across pages */
-            h1, h2, h3, h4, h5, h6 {
+            .docx-wrapper > section.docx:last-child,
+            section.docx:last-child,
+            section:last-child {
               page-break-after: avoid !important;
               break-after: avoid !important;
+            }
+            table {
+              border-collapse: collapse !important;
             }
             tr {
               page-break-inside: avoid !important;
               break-inside: avoid !important;
-            }
-            img {
-              page-break-inside: avoid !important;
-              break-inside: avoid !important;
-              max-width: 100% !important;
-            }
-            table {
-              border-collapse: collapse !important;
-              width: 100% !important;
             }
           </style>
         </head>
@@ -344,13 +270,12 @@ export default function WordToPdf() {
     `);
     printDoc.close();
 
-    // Trigger print directly inside iframe without opening any new tab
     setTimeout(() => {
       try {
         iframe.contentWindow.focus();
         iframe.contentWindow.print();
       } catch (e) {
-        console.error('Print iframe error:', e);
+        console.error('Print error:', e);
       }
     }, 450);
   };
@@ -428,7 +353,7 @@ export default function WordToPdf() {
           </div>
         )}
 
-        {/* DOCX Preview Scroll Viewport - Always mounted so containerRef.current is ready */}
+        {/* DOCX Preview Scroll Viewport */}
         <div
           style={{
             display: rendered ? 'block' : 'none',
@@ -478,18 +403,18 @@ export default function WordToPdf() {
                 className="btn btn-secondary"
                 style={{ padding: '0.85rem', fontSize: '0.95rem', justifyContent: 'center' }}
                 onClick={printDocument}
-                title="Opens browser print dialog with vector fonts and zero headers/footers"
+                title="Opens browser print dialog with vector fonts"
               >
                 <Printer size={16} />
                 Print / Save as PDF (Vector)
               </button>
             </div>
 
-            {/* Quality comparison note */}
+            {/* Print configuration tip */}
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', padding: '0.65rem 0.85rem', background: 'rgba(59, 130, 246, 0.08)', border: '1px solid rgba(59, 130, 246, 0.2)', borderRadius: 'var(--radius-sm)', fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
               <Sparkles size={14} color="#3b82f6" style={{ marginTop: '2px', flexShrink: 0 }} />
               <div>
-                <strong>Two ways to save:</strong> <strong>Download as PDF</strong> uses intelligent white-space detection so lines are never split. For 100% vector fonts and selectable text, use <strong>Print / Save as PDF</strong> (select <em>Destination: Save as PDF</em>).
+                <strong>Recommendation:</strong> Use <strong>Download as PDF</strong> for 1-click direct high-res export (exact {pageCount} {pageCount === 1 ? 'page' : 'pages'}, no setup needed). If using <strong>Print</strong>, uncheck <em>Headers and footers</em> and check <em>Background graphics</em>.
               </div>
             </div>
           </div>
