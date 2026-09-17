@@ -65,9 +65,16 @@ export default function WordToPdf() {
         });
 
         if (!cancelled) {
-          // Count pages
+          // Calculate realistic page count based on A4 aspect ratio (297/210 ≈ 1.414)
           const sections = containerRef.current.querySelectorAll('section');
-          setPageCount(sections.length || 1);
+          let estimatedPages = 0;
+          sections.forEach(s => {
+            const h = s.offsetHeight || 0;
+            const w = s.offsetWidth || 794;
+            const sub = Math.max(1, Math.ceil((h - 20) / (w * 1.414)));
+            estimatedPages += sub;
+          });
+          setPageCount(estimatedPages || (sections.length || 1));
           setRendered(true);
         }
       } catch (err) {
@@ -146,24 +153,52 @@ export default function WordToPdf() {
 
       setProgressMsg('Assembling PDF document...');
 
-      // Create PDF with first page dimensions
-      const first = pageImages[0];
-      const pdfWidth = 210; // A4 standard width in mm
-      const pdfHeight = (first.height / first.width) * pdfWidth;
+      // Standard A4 dimensions in mm
+      const A4_WIDTH_MM = 210;
+      const A4_HEIGHT_MM = 297;
+      const A4_RATIO = A4_HEIGHT_MM / A4_WIDTH_MM; // ~1.4142
 
       const pdf = new jsPDF({
-        orientation: pdfHeight > pdfWidth ? 'portrait' : 'landscape',
+        orientation: 'portrait',
         unit: 'mm',
-        format: [pdfWidth, pdfHeight],
+        format: 'a4',
       });
+      let isFirstPage = true;
 
       for (let i = 0; i < pageImages.length; i++) {
         const img = pageImages[i];
-        const pageH = (img.height / img.width) * pdfWidth;
-        if (i > 0) {
-          pdf.addPage([pdfWidth, pageH], pageH > pdfWidth ? 'portrait' : 'landscape');
+        const pageHeightPx = img.width * A4_RATIO;
+        const subPages = Math.max(1, Math.ceil((img.height - 15) / pageHeightPx));
+
+        if (subPages === 1) {
+          // Normal single page
+          if (!isFirstPage) pdf.addPage('a4', 'portrait');
+          isFirstPage = false;
+          pdf.addImage(img.dataUrl, 'JPEG', 0, 0, A4_WIDTH_MM, (img.height / img.width) * A4_WIDTH_MM);
+        } else {
+          // Multi-page continuous section: slice into A4 chunks
+          const imgObj = new Image();
+          imgObj.src = img.dataUrl;
+          await new Promise((res) => { imgObj.onload = res; });
+
+          for (let p = 0; p < subPages; p++) {
+            const sY = p * pageHeightPx;
+            const sH = Math.min(pageHeightPx, img.height - sY);
+
+            const sliceCanvas = document.createElement('canvas');
+            sliceCanvas.width = img.width;
+            sliceCanvas.height = pageHeightPx;
+            const ctx = sliceCanvas.getContext('2d');
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, sliceCanvas.width, sliceCanvas.height);
+            ctx.drawImage(imgObj, 0, sY, img.width, sH, 0, 0, img.width, sH);
+
+            if (!isFirstPage) pdf.addPage('a4', 'portrait');
+            isFirstPage = false;
+
+            pdf.addImage(sliceCanvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, A4_WIDTH_MM, A4_HEIGHT_MM);
+          }
         }
-        pdf.addImage(img.dataUrl, 'JPEG', 0, 0, pdfWidth, pageH);
       }
 
       const outName = (file?.name || 'document').replace(/\.docx$/i, '') + '.pdf';
