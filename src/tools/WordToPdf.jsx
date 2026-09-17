@@ -1,6 +1,42 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { FileText, Download, RefreshCw, Eye, ZoomIn, ZoomOut, Printer, CheckCircle2 } from 'lucide-react';
+import { FileText, Download, RefreshCw, Eye, ZoomIn, ZoomOut, Printer, CheckCircle2, Sparkles } from 'lucide-react';
 import AdBanner from '../components/AdBanner';
+
+/**
+ * Finds the nearest horizontal blank row (white space) near idealCutY
+ * so we never cut through a line of text, table, or box.
+ */
+function findSafeCutY(ctx, canvasWidth, idealCutY, lookback = 150) {
+  const minY = Math.max(0, idealCutY - lookback);
+  const scanH = idealCutY - minY;
+  if (scanH <= 0) return idealCutY;
+
+  try {
+    const data = ctx.getImageData(0, minY, canvasWidth, scanH).data;
+    // Walk upwards from idealCutY towards minY
+    for (let r = scanH - 1; r >= 0; r--) {
+      let isRowBlank = true;
+      const rowOffset = r * canvasWidth * 4;
+      for (let c = 0; c < canvasWidth; c += 8) { // sample every 8px
+        const idx = rowOffset + c * 4;
+        const red = data[idx];
+        const green = data[idx + 1];
+        const blue = data[idx + 2];
+        // If not white / near-white background
+        if (red < 242 || green < 242 || blue < 242) {
+          isRowBlank = false;
+          break;
+        }
+      }
+      if (isRowBlank) {
+        return minY + r;
+      }
+    }
+  } catch (e) {
+    console.warn('Blank space detection error:', e);
+  }
+  return idealCutY;
+}
 
 export default function WordToPdf() {
   const [file, setFile] = useState(null);
@@ -79,7 +115,7 @@ export default function WordToPdf() {
         }
       } catch (err) {
         console.error('DOCX render error:', err);
-        if (!cancelled) alert('Failed to render the document. Make sure it\'s a valid .docx file.');
+        if (!cancelled) alert('Failed to render the document. Make sure it\'s a valid .docx file: ' + (err.message || ''));
       } finally {
         if (!cancelled) setBusy(false);
       }
@@ -121,39 +157,6 @@ export default function WordToPdf() {
       const { default: html2canvas } = await import('html2canvas-pro');
       const { jsPDF } = await import('jspdf');
 
-      const pageImages = [];
-
-      for (let i = 0; i < sections.length; i++) {
-        const section = sections[i];
-        setProgressMsg(`Processing page ${i + 1} of ${sections.length}...`);
-
-        const canvas = await html2canvas(section, {
-          scale: 2, // 2x high resolution
-          useCORS: true,
-          allowTaint: true,
-          backgroundColor: '#ffffff',
-          logging: false,
-          scrollX: 0,
-          scrollY: 0,
-        });
-
-        pageImages.push({
-          dataUrl: canvas.toDataURL('image/jpeg', 0.95),
-          width: canvas.width,
-          height: canvas.height,
-        });
-      }
-
-      if (!pageImages.length) {
-        alert('Failed to capture document pages.');
-        setConverting(false);
-        containerRef.current.style.transform = origTransform;
-        return;
-      }
-
-      setProgressMsg('Assembling PDF document...');
-
-      // Standard A4 dimensions in mm
       const A4_WIDTH_MM = 210;
       const A4_HEIGHT_MM = 297;
       const A4_RATIO = A4_HEIGHT_MM / A4_WIDTH_MM; // ~1.4142
@@ -165,38 +168,63 @@ export default function WordToPdf() {
       });
       let isFirstPage = true;
 
-      for (let i = 0; i < pageImages.length; i++) {
-        const img = pageImages[i];
-        const pageHeightPx = img.width * A4_RATIO;
-        const subPages = Math.max(1, Math.ceil((img.height - 15) / pageHeightPx));
+      for (let i = 0; i < sections.length; i++) {
+        const section = sections[i];
+        setProgressMsg(`Processing document section ${i + 1} of ${sections.length}...`);
 
-        if (subPages === 1) {
-          // Normal single page
+        const canvas = await html2canvas(section, {
+          scale: 2, // 2x high resolution
+          useCORS: true,
+          allowTaint: true,
+          backgroundColor: '#ffffff',
+          logging: false,
+          scrollX: 0,
+          scrollY: 0,
+        });
+
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        const idealPageH = canvas.width * A4_RATIO;
+
+        if (canvas.height <= idealPageH + 15) {
+          // Fits on single A4 page
           if (!isFirstPage) pdf.addPage('a4', 'portrait');
           isFirstPage = false;
-          pdf.addImage(img.dataUrl, 'JPEG', 0, 0, A4_WIDTH_MM, (img.height / img.width) * A4_WIDTH_MM);
+          pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, A4_WIDTH_MM, (canvas.height / canvas.width) * A4_WIDTH_MM);
         } else {
-          // Multi-page continuous section: slice into A4 chunks
-          const imgObj = new Image();
-          imgObj.src = img.dataUrl;
-          await new Promise((res) => { imgObj.onload = res; });
+          // Multi-page continuous section: smart content-aware page slicing
+          let currentY = 0;
+          let subPageIndex = 1;
 
-          for (let p = 0; p < subPages; p++) {
-            const sY = p * pageHeightPx;
-            const sH = Math.min(pageHeightPx, img.height - sY);
+          while (currentY < canvas.height - 10) {
+            setProgressMsg(`Slicing page ${subPageIndex} (content-aware)...`);
+            const remainingH = canvas.height - currentY;
+            let sliceH = Math.min(idealPageH, remainingH);
+
+            if (remainingH > idealPageH) {
+              // Find safe horizontal whitespace so text lines and tables are NEVER chopped
+              const safeCutY = findSafeCutY(ctx, canvas.width, currentY + idealPageH, 160);
+              sliceH = safeCutY - currentY;
+              if (sliceH <= 100) {
+                // Fallback if no white space found
+                sliceH = idealPageH;
+              }
+            }
 
             const sliceCanvas = document.createElement('canvas');
-            sliceCanvas.width = img.width;
-            sliceCanvas.height = pageHeightPx;
-            const ctx = sliceCanvas.getContext('2d');
-            ctx.fillStyle = '#ffffff';
-            ctx.fillRect(0, 0, sliceCanvas.width, sliceCanvas.height);
-            ctx.drawImage(imgObj, 0, sY, img.width, sH, 0, 0, img.width, sH);
+            sliceCanvas.width = canvas.width;
+            sliceCanvas.height = idealPageH; // Keep standard A4 proportions
+            const sCtx = sliceCanvas.getContext('2d');
+            sCtx.fillStyle = '#ffffff';
+            sCtx.fillRect(0, 0, sliceCanvas.width, sliceCanvas.height);
+            sCtx.drawImage(canvas, 0, currentY, canvas.width, sliceH, 0, 0, canvas.width, sliceH);
 
             if (!isFirstPage) pdf.addPage('a4', 'portrait');
             isFirstPage = false;
 
             pdf.addImage(sliceCanvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, A4_WIDTH_MM, A4_HEIGHT_MM);
+
+            currentY += sliceH;
+            subPageIndex++;
           }
         }
       }
@@ -236,13 +264,61 @@ export default function WordToPdf() {
           <title>${(file?.name || 'Document').replace(/\.docx$/i, '')}</title>
           ${docStyles}
           <style>
-            @page { margin: 15mm; size: auto; }
-            body { margin: 0; padding: 20px; background: white !important; font-family: system-ui, sans-serif; }
-            .docx-wrapper { background: transparent !important; padding: 0 !important; box-shadow: none !important; }
-            section.docx, section { box-shadow: none !important; margin: 0 auto 20px auto !important; background: white !important; page-break-after: always; break-after: page; }
+            @page {
+              size: A4 portrait;
+              margin: 0; /* Suppresses browser URL headers and footers */
+            }
+            * {
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+            body {
+              margin: 0 !important;
+              padding: 0 !important;
+              background: white !important;
+              font-family: Aptos, Calibri, "Segoe UI", -apple-system, BlinkMacSystemFont, Arial, sans-serif !important;
+            }
+            .docx-wrapper {
+              background: white !important;
+              padding: 0 !important;
+              box-shadow: none !important;
+              margin: 0 !important;
+            }
+            section.docx, section {
+              box-shadow: none !important;
+              border: none !important;
+              margin: 0 auto !important;
+              padding: 16mm 14mm !important;
+              background: white !important;
+              max-width: 100% !important;
+              box-sizing: border-box !important;
+            }
+            /* Prevent chopping text lines, headings, list items, and tables */
+            p, h1, h2, h3, h4, h5, h6, li, tr, blockquote, figure,
+            div[style*="border"], div[style*="background"], div[class*="box"], div[class*="card"] {
+              page-break-inside: avoid !important;
+              break-inside: avoid !important;
+            }
+            h1, h2, h3, h4, h5, h6 {
+              page-break-after: avoid !important;
+              break-after: avoid !important;
+            }
+            table {
+              page-break-inside: auto !important;
+              border-collapse: collapse !important;
+            }
+            tr, td, th {
+              page-break-inside: avoid !important;
+              break-inside: avoid !important;
+            }
             @media print {
               body { padding: 0 !important; }
-              section.docx, section { margin: 0 !important; box-shadow: none !important; }
+              section.docx, section {
+                margin: 0 !important;
+                box-shadow: none !important;
+                page-break-after: always;
+                break-after: page;
+              }
             }
           </style>
         </head>
@@ -253,7 +329,7 @@ export default function WordToPdf() {
               setTimeout(function() {
                 window.focus();
                 window.print();
-              }, 400);
+              }, 450);
             };
           </script>
         </body>
@@ -345,7 +421,7 @@ export default function WordToPdf() {
             borderRadius: 'var(--radius-sm)',
             border: '1px solid var(--border-main)',
             padding: '1.25rem 0.5rem',
-            marginBottom: '1.25rem',
+            marginBottom: '1rem',
             boxShadow: 'inset 0 2px 6px rgba(0,0,0,0.2)',
           }}
         >
@@ -371,24 +447,34 @@ export default function WordToPdf() {
 
         {/* Action Buttons */}
         {rendered && !converting && (
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '0.6rem' }}>
-            <button
-              className="btn btn-blue"
-              style={{ padding: '0.85rem', fontSize: '0.95rem' }}
-              onClick={convertToPdf}
-            >
-              <Download size={16} />
-              Download as PDF
-            </button>
-            <button
-              className="btn btn-secondary"
-              style={{ padding: '0.85rem 1.1rem', fontSize: '0.9rem' }}
-              onClick={printDocument}
-              title="Open browser print dialog to save as vector PDF with selectable text"
-            >
-              <Printer size={16} />
-              Print / Save as PDF
-            </button>
+          <div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '0.85rem' }}>
+              <button
+                className="btn btn-blue"
+                style={{ padding: '0.85rem', fontSize: '0.95rem', justifyContent: 'center' }}
+                onClick={convertToPdf}
+              >
+                <Download size={16} />
+                Download as PDF
+              </button>
+              <button
+                className="btn btn-secondary"
+                style={{ padding: '0.85rem', fontSize: '0.95rem', justifyContent: 'center' }}
+                onClick={printDocument}
+                title="Opens browser print dialog with vector fonts and zero headers/footers"
+              >
+                <Printer size={16} />
+                Print / Save as PDF (Vector)
+              </button>
+            </div>
+
+            {/* Quality comparison note */}
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem', padding: '0.65rem 0.85rem', background: 'rgba(59, 130, 246, 0.08)', border: '1px solid rgba(59, 130, 246, 0.2)', borderRadius: 'var(--radius-sm)', fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
+              <Sparkles size={14} color="#3b82f6" style={{ marginTop: '2px', flexShrink: 0 }} />
+              <div>
+                <strong>Two ways to save:</strong> <strong>Download as PDF</strong> uses intelligent white-space detection so lines are never split. For 100% vector fonts and selectable text, use <strong>Print / Save as PDF</strong> (select <em>Destination: Save as PDF</em>).
+              </div>
+            </div>
           </div>
         )}
       </div>
