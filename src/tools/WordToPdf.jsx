@@ -278,26 +278,27 @@ export default function WordToPdf() {
           ${docStyles}
           <style>
             @page {
-              size: 210mm 297mm;
-              margin: 0mm !important;
+              size: A4 portrait;
+              margin: 12mm 10mm;
             }
             * {
               -webkit-print-color-adjust: exact !important;
               print-color-adjust: exact !important;
+              box-sizing: border-box !important;
             }
             html, body {
               margin: 0 !important;
               padding: 0 !important;
               background: white !important;
               font-family: Aptos, Calibri, "Segoe UI", -apple-system, BlinkMacSystemFont, Arial, sans-serif !important;
-              width: 210mm !important;
+              width: 100% !important;
             }
             .docx-wrapper {
               background: white !important;
               padding: 0 !important;
               margin: 0 !important;
               box-shadow: none !important;
-              width: 210mm !important;
+              width: 100% !important;
               display: block !important;
             }
             .docx-wrapper > section.docx,
@@ -307,40 +308,32 @@ export default function WordToPdf() {
               border: none !important;
               margin: 0 !important;
               padding: 0 !important;
-              width: 210mm !important;
-              max-width: 210mm !important;
-              height: 296.5mm !important; /* Exactly 1 A4 sheet: eliminates the 1-pixel overflow that caused blank pages */
-              min-height: 0 !important;
-              max-height: 296.5mm !important;
+              width: 100% !important;
+              max-width: 100% !important;
+              min-height: auto !important;
+              height: auto !important;
+              max-height: none !important;
               background: white !important;
               box-sizing: border-box !important;
-              overflow: hidden !important;
-              page-break-inside: avoid !important;
-              break-inside: avoid !important;
-              page-break-after: always !important;
-              break-after: page !important;
-              display: flex !important;
-              flex-direction: column !important;
+              overflow: visible !important;
             }
-            .docx-wrapper > section.docx:last-child,
-            section.docx:last-child,
-            section:last-child {
+            /* Protect headings and table rows from being split across pages */
+            h1, h2, h3, h4, h5, h6 {
               page-break-after: avoid !important;
               break-after: avoid !important;
             }
-            /* Preserve tables and styles */
-            p, h1, h2, h3, h4, h5, h6, li, tr, blockquote, figure,
-            div[style*="border"], div[style*="background"], div[class*="box"], div[class*="card"] {
+            tr {
               page-break-inside: avoid !important;
               break-inside: avoid !important;
+            }
+            img {
+              page-break-inside: avoid !important;
+              break-inside: avoid !important;
+              max-width: 100% !important;
             }
             table {
-              page-break-inside: auto !important;
               border-collapse: collapse !important;
-            }
-            tr, td, th {
-              page-break-inside: avoid !important;
-              break-inside: avoid !important;
+              width: 100% !important;
             }
           </style>
         </head>
