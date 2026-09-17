@@ -300,32 +300,31 @@ export default function WordToPdf() {
           </div>
         )}
 
-        {/* DOCX Preview Scroll Viewport */}
-        {rendered && (
+        {/* DOCX Preview Scroll Viewport - Always mounted so containerRef.current is ready */}
+        <div
+          style={{
+            display: rendered ? 'block' : 'none',
+            maxHeight: '540px',
+            overflow: 'auto',
+            background: '#525659',
+            borderRadius: 'var(--radius-sm)',
+            border: '1px solid var(--border-main)',
+            padding: '1.25rem 0.5rem',
+            marginBottom: '1.25rem',
+            boxShadow: 'inset 0 2px 6px rgba(0,0,0,0.2)',
+          }}
+        >
           <div
+            ref={containerRef}
             style={{
-              maxHeight: '520px',
-              overflow: 'auto',
-              background: '#525659',
-              borderRadius: 'var(--radius-sm)',
-              border: '1px solid var(--border-main)',
-              padding: '1.25rem 0.5rem',
-              marginBottom: '1.25rem',
-              boxShadow: 'inset 0 2px 6px rgba(0,0,0,0.2)',
+              transform: `scale(${zoom / 100})`,
+              transformOrigin: 'top center',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
             }}
-          >
-            <div
-              ref={containerRef}
-              style={{
-                transform: `scale(${zoom / 100})`,
-                transformOrigin: 'top center',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-              }}
-            />
-          </div>
-        )}
+          />
+        </div>
 
         {/* Conversion In-Progress */}
         {converting && (
