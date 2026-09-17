@@ -247,17 +247,29 @@ export default function WordToPdf() {
 
   const printDocument = () => {
     if (!containerRef.current) return;
-    const printWindow = window.open('', '_blank');
-    if (!printWindow) {
-      alert('Pop-up was blocked. Please allow pop-ups for this site, or use the direct "Download as PDF" button.');
-      return;
-    }
+
+    // Use an invisible iframe so NO 'about:blank' tab ever opens or stays behind
+    let iframe = document.getElementById('docx-print-frame');
+    if (iframe) iframe.remove();
+
+    iframe = document.createElement('iframe');
+    iframe.id = 'docx-print-frame';
+    iframe.style.position = 'fixed';
+    iframe.style.right = '0';
+    iframe.style.bottom = '0';
+    iframe.style.width = '0';
+    iframe.style.height = '0';
+    iframe.style.border = '0';
+    iframe.style.visibility = 'hidden';
+    document.body.appendChild(iframe);
 
     const docStyles = Array.from(document.querySelectorAll('style, link[rel="stylesheet"]'))
       .map(el => el.outerHTML)
       .join('\n');
 
-    printWindow.document.write(`
+    const printDoc = iframe.contentWindow.document;
+    printDoc.open();
+    printDoc.write(`
       <!DOCTYPE html>
       <html>
         <head>
@@ -267,7 +279,7 @@ export default function WordToPdf() {
           <style>
             @page {
               size: A4 portrait;
-              margin: 0mm !important;
+              margin: 10mm;
             }
             * {
               -webkit-print-color-adjust: exact !important;
@@ -278,37 +290,32 @@ export default function WordToPdf() {
               padding: 0 !important;
               background: white !important;
               font-family: Aptos, Calibri, "Segoe UI", -apple-system, BlinkMacSystemFont, Arial, sans-serif !important;
+              width: 100% !important;
             }
             .docx-wrapper {
               background: transparent !important;
               padding: 0 !important;
               margin: 0 !important;
               box-shadow: none !important;
+              width: 100% !important;
             }
             .docx-wrapper > section.docx,
             section.docx,
             section {
               box-shadow: none !important;
               border: none !important;
-              margin: 0 auto !important;
-              margin-bottom: 0 !important;
-              min-height: 0 !important;
-              max-height: 296mm !important; /* Stays strictly within 1 A4 sheet, eliminating alternating blank pages */
+              margin: 0 auto 20px auto !important;
+              padding: 0 !important;
+              width: 100% !important;
+              max-width: 100% !important;
+              min-height: auto !important;
+              height: auto !important;
+              max-height: none !important; /* Allows all pages to flow naturally */
               background: white !important;
               box-sizing: border-box !important;
-              overflow: hidden !important;
-              page-break-inside: avoid !important;
-              break-inside: avoid !important;
-              page-break-after: always !important;
-              break-after: page !important;
+              overflow: visible !important; /* Never cuts off content at page 1 */
             }
-            .docx-wrapper > section.docx:last-child,
-            section.docx:last-child,
-            section:last-child {
-              page-break-after: avoid !important;
-              break-after: avoid !important;
-            }
-            /* Protect headings, list items, and table cells */
+            /* Protect headings, list items, and table rows from being split across page boundaries */
             p, h1, h2, h3, h4, h5, h6, li, tr, blockquote, figure,
             div[style*="border"], div[style*="background"], div[class*="box"], div[class*="card"] {
               page-break-inside: avoid !important;
@@ -326,22 +333,29 @@ export default function WordToPdf() {
               page-break-inside: avoid !important;
               break-inside: avoid !important;
             }
+            @media print {
+              section.docx, section {
+                margin-bottom: 0 !important;
+              }
+            }
           </style>
         </head>
         <body>
           ${containerRef.current.innerHTML}
-          <script>
-            window.onload = function() {
-              setTimeout(function() {
-                window.focus();
-                window.print();
-              }, 450);
-            };
-          </script>
         </body>
       </html>
     `);
-    printWindow.document.close();
+    printDoc.close();
+
+    // Trigger print directly inside iframe without opening any new tab
+    setTimeout(() => {
+      try {
+        iframe.contentWindow.focus();
+        iframe.contentWindow.print();
+      } catch (e) {
+        console.error('Print iframe error:', e);
+      }
+    }, 450);
   };
 
   const formatSize = (bytes) => {
