@@ -170,7 +170,7 @@ export default function WordToPdf() {
   };
 
   /**
-   * Native vector print export using invisible background iframe
+   * Native vector print export using invisible background iframe with DOM node sanitization
    */
   const printDocument = () => {
     if (!containerRef.current) return;
@@ -189,6 +189,42 @@ export default function WordToPdf() {
     iframe.style.visibility = 'hidden';
     document.body.appendChild(iframe);
 
+    // Clone rendered DOM and directly sanitize node styles to prevent print overflow
+    const clone = containerRef.current.cloneNode(true);
+
+    const wrappers = clone.querySelectorAll('.docx-wrapper, [class*="wrapper"]');
+    wrappers.forEach(w => {
+      w.style.padding = '0';
+      w.style.margin = '0';
+      w.style.background = 'white';
+      w.style.display = 'block';
+    });
+
+    const sections = Array.from(clone.querySelectorAll('section'));
+    sections.forEach((sec, i) => {
+      // Direct node override: strip the inline 297mm min-height that forces Chrome to spill onto blank pages
+      sec.style.minHeight = '0';
+      sec.style.height = 'auto';
+      sec.style.maxHeight = 'none';
+      sec.style.marginTop = '0';
+      sec.style.marginBottom = '0';
+      sec.style.paddingBottom = '0';
+      sec.style.boxShadow = 'none';
+      sec.style.border = 'none';
+      sec.style.width = '100%';
+      sec.style.maxWidth = '100%';
+      sec.style.display = 'block'; // Must be block for Chrome pagination
+      sec.style.overflow = 'visible';
+
+      if (i < sections.length - 1) {
+        sec.style.pageBreakAfter = 'always';
+        sec.style.breakAfter = 'page';
+      } else {
+        sec.style.pageBreakAfter = 'auto';
+        sec.style.breakAfter = 'auto';
+      }
+    });
+
     const docStyles = Array.from(document.querySelectorAll('style, link[rel="stylesheet"]'))
       .map(el => el.outerHTML)
       .join('\n');
@@ -205,7 +241,7 @@ export default function WordToPdf() {
           <style>
             @page {
               size: A4 portrait;
-              margin: 0mm !important;
+              margin: 10mm;
             }
             * {
               -webkit-print-color-adjust: exact !important;
@@ -219,41 +255,6 @@ export default function WordToPdf() {
               font-family: Aptos, Calibri, "Segoe UI", -apple-system, BlinkMacSystemFont, Arial, sans-serif !important;
               width: 100% !important;
             }
-            .docx-wrapper {
-              background: white !important;
-              padding: 0 !important;
-              margin: 0 !important;
-              box-shadow: none !important;
-              width: 100% !important;
-              display: block !important;
-            }
-            .docx-wrapper > section.docx,
-            section.docx,
-            section {
-              box-shadow: none !important;
-              border: none !important;
-              margin: 0 auto !important;
-              margin-bottom: 0 !important;
-              width: 100% !important;
-              max-width: 100% !important;
-              min-height: 0 !important; /* Cancels 297mm inline style that causes 2nd blank page */
-              height: auto !important;
-              max-height: none !important;
-              background: white !important;
-              box-sizing: border-box !important;
-              overflow: visible !important;
-              display: block !important; /* CRITICAL: Must be block (NOT flex) so Chrome paginates every page */
-              page-break-inside: avoid !important;
-              break-inside: avoid !important;
-              page-break-after: always !important;
-              break-after: page !important;
-            }
-            .docx-wrapper > section.docx:last-child,
-            section.docx:last-child,
-            section:last-child {
-              page-break-after: avoid !important;
-              break-after: avoid !important;
-            }
             table {
               border-collapse: collapse !important;
             }
@@ -261,10 +262,19 @@ export default function WordToPdf() {
               page-break-inside: avoid !important;
               break-inside: avoid !important;
             }
+            img {
+              page-break-inside: avoid !important;
+              break-inside: avoid !important;
+              max-width: 100% !important;
+            }
+            h1, h2, h3, h4, h5, h6 {
+              page-break-after: avoid !important;
+              break-after: avoid !important;
+            }
           </style>
         </head>
         <body>
-          ${containerRef.current.innerHTML}
+          ${clone.innerHTML}
         </body>
       </html>
     `);
