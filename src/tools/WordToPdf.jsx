@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { FileText, Download, RefreshCw, Eye, ZoomIn, ZoomOut } from 'lucide-react';
+import { FileText, Download, RefreshCw, Eye, ZoomIn, ZoomOut, Printer, CheckCircle2 } from 'lucide-react';
 import AdBanner from '../components/AdBanner';
 
 export default function WordToPdf() {
@@ -8,6 +8,8 @@ export default function WordToPdf() {
   const [rendered, setRendered] = useState(false);
   const [busy, setBusy] = useState(false);
   const [converting, setConverting] = useState(false);
+  const [progressMsg, setProgressMsg] = useState('');
+  const [pageCount, setPageCount] = useState(0);
   const [zoom, setZoom] = useState(100);
   const fileRef = useRef(null);
   const containerRef = useRef(null);
@@ -21,6 +23,7 @@ export default function WordToPdf() {
     }
     setBusy(true);
     setRendered(false);
+    setPageCount(0);
     try {
       const buf = await f.arrayBuffer();
       setFile({ name: f.name, size: f.size });
@@ -39,14 +42,13 @@ export default function WordToPdf() {
     let cancelled = false;
     (async () => {
       try {
-        // Dynamic import to avoid bundling issues
         const docxPreview = await import('docx-preview');
 
         // Clear previous render
         containerRef.current.innerHTML = '';
 
         await docxPreview.renderAsync(arrayBuf, containerRef.current, null, {
-          className: 'docx-preview-wrapper',
+          className: 'docx',
           inWrapper: true,
           ignoreWidth: false,
           ignoreHeight: false,
@@ -62,7 +64,12 @@ export default function WordToPdf() {
           renderEndnotes: true,
         });
 
-        if (!cancelled) setRendered(true);
+        if (!cancelled) {
+          // Count pages
+          const sections = containerRef.current.querySelectorAll('section');
+          setPageCount(sections.length || 1);
+          setRendered(true);
+        }
       } catch (err) {
         console.error('DOCX render error:', err);
         if (!cancelled) alert('Failed to render the document. Make sure it\'s a valid .docx file.');
@@ -77,38 +84,51 @@ export default function WordToPdf() {
   const convertToPdf = async () => {
     if (!rendered || !containerRef.current) return;
     setConverting(true);
+    setProgressMsg('Preparing document pages...');
+
+    const origTransform = containerRef.current.style.transform;
 
     try {
-      // Get all rendered page sections
-      const wrapper = containerRef.current.querySelector('.docx-wrapper') || containerRef.current;
-      const sections = wrapper.querySelectorAll('section.docx');
+      // Temporarily reset preview zoom for high-res capture
+      containerRef.current.style.transform = 'none';
+
+      // Find all sections or pages rendered by docx-preview
+      let sections = Array.from(containerRef.current.querySelectorAll('section'));
+      if (!sections.length) {
+        sections = Array.from(containerRef.current.querySelectorAll('.docx-wrapper > *, [class*="docx-wrapper"] > *'));
+      }
+      if (!sections.length) {
+        sections = Array.from(containerRef.current.querySelectorAll('.docx, [class*="docx"]'));
+      }
+      if (!sections.length && containerRef.current.children.length) {
+        sections = Array.from(containerRef.current.children);
+      }
 
       if (!sections.length) {
-        alert('No rendered pages found to convert.');
+        alert('No rendered pages found to convert. Please try reloading your file.');
         setConverting(false);
+        containerRef.current.style.transform = origTransform;
         return;
       }
 
       const { default: html2canvas } = await import('html2canvas-pro');
       const { jsPDF } = await import('jspdf');
 
-      // Capture each page section and assemble into PDF
       const pageImages = [];
 
-      for (const section of sections) {
-        // Temporarily reset zoom for capture
-        const origTransform = section.style.transform;
-        section.style.transform = 'none';
+      for (let i = 0; i < sections.length; i++) {
+        const section = sections[i];
+        setProgressMsg(`Processing page ${i + 1} of ${sections.length}...`);
 
         const canvas = await html2canvas(section, {
-          scale: 2, // High-res capture
+          scale: 2, // 2x high resolution
           useCORS: true,
           allowTaint: true,
           backgroundColor: '#ffffff',
           logging: false,
+          scrollX: 0,
+          scrollY: 0,
         });
-
-        section.style.transform = origTransform;
 
         pageImages.push({
           dataUrl: canvas.toDataURL('image/jpeg', 0.95),
@@ -120,12 +140,15 @@ export default function WordToPdf() {
       if (!pageImages.length) {
         alert('Failed to capture document pages.');
         setConverting(false);
+        containerRef.current.style.transform = origTransform;
         return;
       }
 
-      // Create PDF with correct page dimensions
+      setProgressMsg('Assembling PDF document...');
+
+      // Create PDF with first page dimensions
       const first = pageImages[0];
-      const pdfWidth = 210; // A4 width in mm
+      const pdfWidth = 210; // A4 standard width in mm
       const pdfHeight = (first.height / first.width) * pdfWidth;
 
       const pdf = new jsPDF({
@@ -135,22 +158,73 @@ export default function WordToPdf() {
       });
 
       for (let i = 0; i < pageImages.length; i++) {
+        const img = pageImages[i];
+        const pageH = (img.height / img.width) * pdfWidth;
         if (i > 0) {
-          const img = pageImages[i];
-          const h = (img.height / img.width) * pdfWidth;
-          pdf.addPage([pdfWidth, h]);
+          pdf.addPage([pdfWidth, pageH], pageH > pdfWidth ? 'portrait' : 'landscape');
         }
-        pdf.addImage(pageImages[i].dataUrl, 'JPEG', 0, 0, pdfWidth,
-          (pageImages[i].height / pageImages[i].width) * pdfWidth);
+        pdf.addImage(img.dataUrl, 'JPEG', 0, 0, pdfWidth, pageH);
       }
 
-      pdf.save(file.name.replace(/\.docx$/i, '') + '.pdf');
+      const outName = (file?.name || 'document').replace(/\.docx$/i, '') + '.pdf';
+      pdf.save(outName);
+      setProgressMsg('Done! Downloading PDF...');
     } catch (err) {
       console.error('PDF conversion error:', err);
-      alert('PDF conversion failed. Please try again.');
+      alert('PDF conversion failed: ' + (err.message || 'Please try again.'));
     } finally {
+      if (containerRef.current) {
+        containerRef.current.style.transform = origTransform;
+      }
       setConverting(false);
+      setProgressMsg('');
     }
+  };
+
+  const printDocument = () => {
+    if (!containerRef.current) return;
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      alert('Pop-up was blocked. Please allow pop-ups for this site, or use the direct "Download as PDF" button.');
+      return;
+    }
+
+    const docStyles = Array.from(document.querySelectorAll('style, link[rel="stylesheet"]'))
+      .map(el => el.outerHTML)
+      .join('\n');
+
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <title>${(file?.name || 'Document').replace(/\.docx$/i, '')}</title>
+          ${docStyles}
+          <style>
+            @page { margin: 15mm; size: auto; }
+            body { margin: 0; padding: 20px; background: white !important; font-family: system-ui, sans-serif; }
+            .docx-wrapper { background: transparent !important; padding: 0 !important; box-shadow: none !important; }
+            section.docx, section { box-shadow: none !important; margin: 0 auto 20px auto !important; background: white !important; page-break-after: always; break-after: page; }
+            @media print {
+              body { padding: 0 !important; }
+              section.docx, section { margin: 0 !important; box-shadow: none !important; }
+            }
+          </style>
+        </head>
+        <body>
+          ${containerRef.current.innerHTML}
+          <script>
+            window.onload = function() {
+              setTimeout(function() {
+                window.focus();
+                window.print();
+              }, 400);
+            };
+          </script>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
   };
 
   const formatSize = (bytes) => {
@@ -166,7 +240,7 @@ export default function WordToPdf() {
         <input type="file" ref={fileRef} onChange={e => loadFile(e.target.files[0])} accept=".docx" hidden />
         <div className="dropzone-icon"><FileText size={24} /></div>
         <div className="dropzone-title">Upload Word Document (.docx)</div>
-        <div className="dropzone-subtitle">Your document will be rendered exactly as it looks, then converted to PDF</div>
+        <div className="dropzone-subtitle">Your document will be rendered exactly as it looks, then converted to high-quality PDF</div>
         <button className="btn btn-blue btn-sm" style={{ marginTop: '0.4rem' }}>Select DOCX File</button>
       </div>
     </div>
@@ -177,11 +251,20 @@ export default function WordToPdf() {
       <AdBanner slotType="leaderboard" />
       <div className="tool-box">
         {/* File info bar */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', paddingBottom: '0.85rem', borderBottom: '1px solid var(--border-main)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', paddingBottom: '0.85rem', borderBottom: '1px solid var(--border-main)', flexWrap: 'wrap', gap: '0.5rem' }}>
           <div>
             <div style={{ fontWeight: 700, fontSize: '0.95rem', wordBreak: 'break-all' }}>{file.name}</div>
-            <div style={{ fontSize: '0.8rem', color: 'var(--text-tertiary)' }}>
-              {formatSize(file.size)} {rendered ? '· Rendered successfully' : busy ? '· Rendering...' : ''}
+            <div style={{ fontSize: '0.8rem', color: 'var(--text-tertiary)', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+              <span>{formatSize(file.size)}</span>
+              {rendered && (
+                <>
+                  <span>·</span>
+                  <span style={{ color: '#10b981', display: 'flex', alignItems: 'center', gap: '0.2rem' }}>
+                    <CheckCircle2 size={12} /> {pageCount} {pageCount === 1 ? 'page' : 'pages'} rendered
+                  </span>
+                </>
+              )}
+              {busy && <span>· Rendering document...</span>}
             </div>
           </div>
           <button className="btn btn-secondary btn-sm" onClick={() => { setFile(null); setArrayBuf(null); setRendered(false); if (containerRef.current) containerRef.current.innerHTML = ''; }}>
@@ -189,18 +272,22 @@ export default function WordToPdf() {
           </button>
         </div>
 
-        {/* Zoom controls */}
+        {/* Zoom & View Controls */}
         {rendered && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.75rem' }}>
-            <Eye size={14} color="var(--text-tertiary)" />
-            <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-secondary)', flex: 1 }}>Document Preview</span>
-            <button className="btn btn-secondary btn-sm" onClick={() => setZoom(z => Math.max(25, z - 15))} style={{ padding: '3px 8px' }}>
-              <ZoomOut size={14} />
-            </button>
-            <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-secondary)', minWidth: '36px', textAlign: 'center' }}>{zoom}%</span>
-            <button className="btn btn-secondary btn-sm" onClick={() => setZoom(z => Math.min(200, z + 15))} style={{ padding: '3px 8px' }}>
-              <ZoomIn size={14} />
-            </button>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Eye size={14} color="var(--text-tertiary)" />
+              <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-secondary)' }}>Document Preview</span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+              <button className="btn btn-secondary btn-sm" onClick={() => setZoom(z => Math.max(25, z - 15))} style={{ padding: '3px 8px' }}>
+                <ZoomOut size={14} />
+              </button>
+              <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-secondary)', minWidth: '38px', textAlign: 'center' }}>{zoom}%</span>
+              <button className="btn btn-secondary btn-sm" onClick={() => setZoom(z => Math.min(200, z + 15))} style={{ padding: '3px 8px' }}>
+                <ZoomIn size={14} />
+              </button>
+            </div>
           </div>
         )}
 
@@ -213,33 +300,62 @@ export default function WordToPdf() {
           </div>
         )}
 
-        {/* DOCX Preview container */}
-        <div
-          ref={containerRef}
-          style={{
-            border: rendered ? '1px solid var(--border-main)' : 'none',
-            borderRadius: 'var(--radius-sm)',
-            maxHeight: '500px',
-            overflow: 'auto',
-            marginBottom: rendered ? '1.25rem' : 0,
-            background: rendered ? '#e8e8e8' : 'transparent',
-            transform: `scale(${zoom / 100})`,
-            transformOrigin: 'top left',
-            width: `${10000 / zoom}%`,
-          }}
-        />
-
-        {/* Convert button */}
+        {/* DOCX Preview Scroll Viewport */}
         {rendered && (
-          <button
-            className="btn btn-blue"
-            style={{ width: '100%', padding: '0.85rem', fontSize: '0.95rem' }}
-            disabled={converting}
-            onClick={convertToPdf}
+          <div
+            style={{
+              maxHeight: '520px',
+              overflow: 'auto',
+              background: '#525659',
+              borderRadius: 'var(--radius-sm)',
+              border: '1px solid var(--border-main)',
+              padding: '1.25rem 0.5rem',
+              marginBottom: '1.25rem',
+              boxShadow: 'inset 0 2px 6px rgba(0,0,0,0.2)',
+            }}
           >
-            <Download size={16} />
-            {converting ? 'Converting to PDF...' : 'Download as PDF'}
-          </button>
+            <div
+              ref={containerRef}
+              style={{
+                transform: `scale(${zoom / 100})`,
+                transformOrigin: 'top center',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+              }}
+            />
+          </div>
+        )}
+
+        {/* Conversion In-Progress */}
+        {converting && (
+          <div style={{ padding: '1rem', background: 'var(--bg-secondary)', borderRadius: 'var(--radius-sm)', marginBottom: '1rem', textAlign: 'center' }}>
+            <div className="spinner" style={{ margin: '0 auto 0.5rem' }} />
+            <div style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--text-primary)' }}>{progressMsg}</div>
+          </div>
+        )}
+
+        {/* Action Buttons */}
+        {rendered && !converting && (
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '0.6rem' }}>
+            <button
+              className="btn btn-blue"
+              style={{ padding: '0.85rem', fontSize: '0.95rem' }}
+              onClick={convertToPdf}
+            >
+              <Download size={16} />
+              Download as PDF
+            </button>
+            <button
+              className="btn btn-secondary"
+              style={{ padding: '0.85rem 1.1rem', fontSize: '0.9rem' }}
+              onClick={printDocument}
+              title="Open browser print dialog to save as vector PDF with selectable text"
+            >
+              <Printer size={16} />
+              Print / Save as PDF
+            </button>
+          </div>
         )}
       </div>
     </div>
