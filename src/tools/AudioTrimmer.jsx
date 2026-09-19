@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Music, Play, Pause, Download, RefreshCw } from 'lucide-react';
-import AdBanner from '../components/AdBanner';
 
 export default function AudioTrimmer() {
   const [file, setFile] = useState(null);
@@ -180,7 +179,6 @@ export default function AudioTrimmer() {
 
   return (
     <div>
-      <AdBanner slotType="leaderboard" />
 
       {/* Header Info */}
       <div style={{ background: 'var(--bg-elevated)', padding: '1.15rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-main)', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>

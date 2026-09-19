@@ -1,6 +1,5 @@
 import React, { useState, useRef } from 'react';
 import { Music, Download, Zap, RefreshCw } from 'lucide-react';
-import AdBanner from '../components/AdBanner';
 
 export default function ExtractAudio() {
   const [file, setFile] = useState(null);
@@ -86,7 +85,6 @@ export default function ExtractAudio() {
 
   return (
     <div>
-      <AdBanner slotType="leaderboard" />
 
       <div style={{ background: 'var(--bg-elevated)', padding: '1.25rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-main)', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem' }}>
         <div>

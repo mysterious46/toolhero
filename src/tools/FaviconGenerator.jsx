@@ -1,7 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Upload, Download, Copy, Check, Smartphone, Globe, RefreshCw } from 'lucide-react';
 import JSZip from 'jszip';
-import AdBanner from '../components/AdBanner';
 
 const ICON_SIZES = [
   { name: 'favicon-16x16.png', size: 16, label: 'Standard Favicon' },
@@ -99,7 +98,6 @@ export default function FaviconGenerator() {
         </p>
       </div>
 
-      <AdBanner slotType="leaderboard" />
 
       {!imageSrc ? (
         <div

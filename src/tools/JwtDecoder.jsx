@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Code, Check, Copy, ShieldAlert, CheckCircle2, Clock, Info } from 'lucide-react';
-import AdBanner from '../components/AdBanner';
 
 export default function JwtDecoder() {
   const [jwt, setJwt] = useState('');
@@ -48,7 +47,6 @@ export default function JwtDecoder() {
 
   return (
     <div>
-      <AdBanner slotType="leaderboard" />
 
       {/* Input JWT Token */}
       <div style={{ background: 'var(--bg-elevated)', padding: '1.25rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-main)', marginBottom: '1.25rem' }}>

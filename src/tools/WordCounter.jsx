@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Type, Copy, Check, Clock, FileText, AlignLeft } from 'lucide-react';
-import AdBanner from '../components/AdBanner';
 
 export default function WordCounter() {
   const [text, setText] = useState('');
@@ -42,7 +41,6 @@ export default function WordCounter() {
 
   return (
     <div>
-      <AdBanner slotType="leaderboard" />
 
       {/* Counter Stat Badges Grid */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '0.85rem', marginBottom: '1.25rem' }}>

@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { FileText, Download, RefreshCw, Eye, ZoomIn, ZoomOut, CheckCircle2, ShieldCheck, Zap } from 'lucide-react';
-import AdBanner from '../components/AdBanner';
 import JSZip from 'jszip';
 
 function findSafeCutY(ctx, width, targetY, searchRange = 60) {
@@ -397,7 +396,6 @@ export default function WordToPdf() {
   if (!file)
     return (
       <div>
-        <AdBanner slotType="leaderboard" />
         <div
           className="dropzone"
           onDragOver={(e) => e.preventDefault()}
@@ -430,7 +428,6 @@ export default function WordToPdf() {
 
   return (
     <div>
-      <AdBanner slotType="leaderboard" />
       <div className="tool-box">
         {/* File info bar */}
         <div

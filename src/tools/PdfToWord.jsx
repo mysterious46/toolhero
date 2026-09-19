@@ -2,7 +2,6 @@ import React, { useState, useRef } from 'react';
 import { FileText, Download, RefreshCw, FileCheck, Loader } from 'lucide-react';
 import * as pdfjsLib from 'pdfjs-dist';
 import { Document, Packer, Paragraph, ImageRun, PageBreak, convertInchesToTwip } from 'docx';
-import AdBanner from '../components/AdBanner';
 
 if (typeof window !== 'undefined' && !pdfjsLib.GlobalWorkerOptions.workerSrc) {
   pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjsLib.version || '4.10.38'}/build/pdf.worker.min.mjs`;
@@ -185,7 +184,6 @@ export default function PdfToWord() {
 
   if (!pdfInfo) return (
     <div>
-      <AdBanner slotType="leaderboard" />
       <div className="dropzone" onDragOver={e => e.preventDefault()} onDrop={e => { e.preventDefault(); if (e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]); }} onClick={() => ref.current?.click()}>
         <input type="file" ref={ref} onChange={e => loadFile(e.target.files[0])} accept=".pdf" hidden />
         <div className="dropzone-icon"><FileText size={24} /></div>
@@ -198,7 +196,6 @@ export default function PdfToWord() {
 
   return (
     <div>
-      <AdBanner slotType="leaderboard" />
       <div className="tool-box">
         {/* File info bar */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', paddingBottom: '0.85rem', borderBottom: '1px solid var(--border-main)' }}>

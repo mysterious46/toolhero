@@ -4,9 +4,11 @@ import Footer from './components/Footer';
 import AdBanner from './components/AdBanner';
 import { CATEGORIES, TOOLS, getToolsByCategory, getToolById, getCategoryById } from './toolsData';
 import { SEO_DATA } from './seoData';
-import { ShieldCheck, Zap, Lock, ArrowLeft, FileText, Image, Sparkles, AlignLeft, Shield, Music, CheckCircle2, HelpCircle, ChevronDown, ChevronUp, Layers, ArrowRight } from 'lucide-react';
+import { ShieldCheck, Zap, Lock, ArrowLeft, FileText, Image, Sparkles, AlignLeft, Shield, Music, CheckCircle2, HelpCircle, ChevronDown, ChevronUp, Layers, ArrowRight, BookOpen, Cpu, Lightbulb } from 'lucide-react';
 
 import { AboutPage, ContactPage, PrivacyPage, TermsPage } from './pages/TrustPages';
+import { GuidesIndexPage, GuideDetailPage } from './pages/GuidesPage';
+import { getGuideBySlug } from './guidesData';
 
 /* ─────────── Clean HTML5 Path Router & Route Validator ─────────── */
 function parsePath() {
@@ -24,6 +26,9 @@ function parsePath() {
 
   if (parts.length === 1) {
     const catId = parts[0];
+    if (catId === 'guides') {
+      return { view: 'guides', path: '/guides' };
+    }
     const trustPages = ['about', 'contact', 'privacy', 'terms'];
     if (trustPages.includes(catId)) {
       return { view: 'trust', catId, path: `/${catId}` };
@@ -36,6 +41,13 @@ function parsePath() {
 
   if (parts.length === 2) {
     const [catId, toolId] = parts;
+    if (catId === 'guides') {
+      const guide = getGuideBySlug(toolId);
+      if (guide) {
+        return { view: 'guide', slug: toolId, path: `/guides/${toolId}` };
+      }
+      return { view: 'notfound', path: cleanPathname };
+    }
     const tool = getToolById(toolId);
     const cat = getCategoryById(catId);
     if (tool && cat && tool.cat === catId) {
@@ -80,6 +92,76 @@ function updateSeoMeta(route) {
   // Ensure indexable routes explicitly have index, follow
   setMetaTag('meta[name="robots"]', 'name', 'robots', 'index, follow');
 
+  if (route.view === 'guides') {
+    document.title = 'Guides, Tutorials & Technical Analyses – ToolHero';
+    setMetaTag('meta[name="description"]', 'name', 'description', 'In-depth technical guides and tutorials on document conversion, PDF compression, image formats, and client-side web security.');
+    setMetaTag('meta[property="og:title"]', 'property', 'og:title', 'ToolHero Guides – Technical Documentation & Tutorials');
+    setMetaTag('meta[property="og:description"]', 'property', 'og:description', 'Deep-dive technical articles on web performance, cryptography, and document management.');
+    setMetaTag('meta[property="og:url"]', 'property', 'og:url', 'https://toolhero.xyz/guides');
+
+    let canonicalEl = document.querySelector('link[rel="canonical"]');
+    if (!canonicalEl) {
+      canonicalEl = document.createElement('link');
+      canonicalEl.setAttribute('rel', 'canonical');
+      document.head.appendChild(canonicalEl);
+    }
+    canonicalEl.setAttribute('href', 'https://toolhero.xyz/guides');
+    return;
+  }
+
+  if (route.view === 'guide') {
+    const guide = getGuideBySlug(route.slug);
+    if (guide) {
+      document.title = `${guide.title} – ToolHero`;
+      setMetaTag('meta[name="description"]', 'name', 'description', guide.summary);
+      setMetaTag('meta[name="keywords"]', 'name', 'keywords', guide.keywords);
+      setMetaTag('meta[property="og:title"]', 'property', 'og:title', guide.title);
+      setMetaTag('meta[property="og:description"]', 'property', 'og:description', guide.summary);
+      setMetaTag('meta[property="og:url"]', 'property', 'og:url', `https://toolhero.xyz/guides/${guide.slug}`);
+
+      let canonicalEl = document.querySelector('link[rel="canonical"]');
+      if (!canonicalEl) {
+        canonicalEl = document.createElement('link');
+        canonicalEl.setAttribute('rel', 'canonical');
+        document.head.appendChild(canonicalEl);
+      }
+      canonicalEl.setAttribute('href', `https://toolhero.xyz/guides/${guide.slug}`);
+
+      let jsonLd = {
+        '@context': 'https://schema.org',
+        '@type': 'Article',
+        'headline': guide.title,
+        'description': guide.summary,
+        'author': {
+          '@type': 'Organization',
+          'name': 'ToolHero Engineering Team'
+        },
+        'publisher': {
+          '@type': 'Organization',
+          'name': 'ToolHero',
+          'logo': {
+            '@type': 'ImageObject',
+            'url': 'https://toolhero.xyz/favicon.svg'
+          }
+        },
+        'mainEntityOfPage': {
+          '@type': 'WebPage',
+          '@id': `https://toolhero.xyz/guides/${guide.slug}`
+        }
+      };
+
+      let scriptEl = document.querySelector('script[type="application/ld+json"]#seo-schema');
+      if (!scriptEl) {
+        scriptEl = document.createElement('script');
+        scriptEl.setAttribute('type', 'application/ld+json');
+        scriptEl.setAttribute('id', 'seo-schema');
+        document.head.appendChild(scriptEl);
+      }
+      scriptEl.textContent = JSON.stringify(jsonLd);
+      return;
+    }
+  }
+
   let path = route.path || window.location.pathname || '/';
   if (path.length > 1 && path.endsWith('/')) {
     path = path.slice(0, -1);
@@ -116,7 +198,6 @@ function updateSeoMeta(route) {
   }
 
   document.title = seo.seoTitle || seo.title || 'ToolHero – Free Online PDF, Image, Video & Security Tools';
-
   setMetaTag('meta[name="description"]', 'name', 'description', seo.description);
   if (seo.keywords) {
     setMetaTag('meta[name="keywords"]', 'name', 'keywords', seo.keywords);
@@ -186,6 +267,8 @@ export default function App() {
 
       <main className="main-content">
         {route.view === 'home' && <HomePage navigate={navigate} />}
+        {route.view === 'guides' && <GuidesIndexPage navigate={navigate} />}
+        {route.view === 'guide' && <GuideDetailPage slug={route.slug} navigate={navigate} />}
         {route.view === 'trust' && (
           route.catId === 'about' ? <AboutPage navigate={navigate} /> :
           route.catId === 'contact' ? <ContactPage navigate={navigate} /> :
@@ -260,10 +343,6 @@ function HomePage({ navigate }) {
           })}
         </div>
       </section>
-
-      <AdBanner slotType="leaderboard" />
-
-      {/* Categorized Tools Grid Section */}
       {search.trim() !== '' || selectedCat !== 'all' ? (
         <section style={{ marginTop: '2rem' }}>
           <h2 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '1rem' }}>
@@ -344,6 +423,11 @@ function HomePage({ navigate }) {
         </div>
       )}
 
+      {/* Compliant In-Article Bottom Ad Slot */}
+      <div style={{ marginTop: '3rem', marginBottom: '1rem' }}>
+        <AdBanner slotType="leaderboard" />
+      </div>
+
       {/* FAQ Section */}
       <FaqSection faqs={seo.faqs} />
     </div>
@@ -373,8 +457,6 @@ function CategoryPage({ catId, navigate }) {
         <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>{seo.subtitle}</p>
       </div>
 
-      <AdBanner slotType="leaderboard" />
-
       <div className="tools-grid" style={{ marginTop: '1.5rem' }}>
         {catTools.map(t => {
           const ToolIcon = t.icon || Sparkles;
@@ -393,6 +475,11 @@ function CategoryPage({ catId, navigate }) {
             </a>
           );
         })}
+      </div>
+
+      {/* Compliant In-Article Bottom Ad Slot */}
+      <div style={{ marginTop: '2.5rem', marginBottom: '1.5rem' }}>
+        <AdBanner slotType="leaderboard" />
       </div>
 
       {seo.faqs && <FaqSection faqs={seo.faqs} />}
@@ -428,9 +515,7 @@ function ToolPage({ catId, toolId, navigate }) {
         <p className="tool-workspace-desc">{seo.subtitle}</p>
       </div>
 
-      <AdBanner slotType="leaderboard" />
-
-      {/* Main Interactive Tool Component */}
+      {/* Main Interactive Tool Component (Zero Ads Above Tool) */}
       <div style={{ marginTop: '1.5rem', marginBottom: '2.5rem' }}>
         <ToolComponent />
       </div>
@@ -438,43 +523,107 @@ function ToolPage({ catId, toolId, navigate }) {
       {/* Structured SEO Guide & Feature Card */}
       <section className="tool-seo-section" style={{
         marginTop: '3rem',
-        padding: '1.75rem',
+        padding: '2rem',
         backgroundColor: 'var(--bg-elevated)',
-        borderRadius: '12px',
+        borderRadius: '14px',
         border: '1px solid var(--border-main)'
       }}>
-        <h2 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <CheckCircle2 size={18} color="#22c55e" /> What is {tool.title}?
+        <h2 style={{ fontSize: '1.35rem', fontWeight: 800, marginBottom: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem', letterSpacing: '-0.02em' }}>
+          <CheckCircle2 size={20} color="#22c55e" /> About {tool.title} & Technical Overview
         </h2>
-        <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: '1.5rem' }}>
-          {seo.description || tool.desc} All calculations, conversions, and processing take place directly in your browser using HTML5 Web APIs. No software installation is required, and your files are 100% private.
+        <p style={{ fontSize: '0.95rem', color: 'var(--text-secondary)', lineHeight: 1.75, marginBottom: '1.5rem' }}>
+          {seo.description || tool.desc} Unlike traditional online file converters that transmit your files to remote cloud servers, ToolHero executes all calculations, compression algorithms, and transformations directly inside your web browser. Your confidential files never touch an external server, eliminating privacy risks and data transfer delays.
         </p>
 
         {/* 4-Step How To Guide */}
-        <h3 style={{ fontSize: '1.05rem', fontWeight: 700, marginBottom: '0.75rem' }}>
+        <h3 style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: '0.85rem' }}>
           How to Use {tool.title}
         </h3>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem', marginBottom: '1.5rem' }}>
-          <div style={{ padding: '0.85rem', borderRadius: '8px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-main)' }}>
-            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--accent)', display: 'block', marginBottom: '0.2rem' }}>STEP 1</span>
-            <span style={{ fontSize: '0.85rem', color: 'var(--text-primary)', fontWeight: 600 }}>Select File or Input</span>
-            <p style={{ fontSize: '0.78rem', color: 'var(--text-tertiary)', marginTop: '0.2rem' }}>Choose your file or paste your text input into the tool box.</p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.85rem', marginBottom: '2rem' }}>
+          <div style={{ padding: '1rem', borderRadius: '10px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-main)' }}>
+            <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--accent)', display: 'block', marginBottom: '0.3rem' }}>STEP 1</span>
+            <span style={{ fontSize: '0.88rem', color: 'var(--text-primary)', fontWeight: 700 }}>Select File or Input</span>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-tertiary)', marginTop: '0.35rem', lineHeight: 1.5 }}>
+              Drag and drop your document, paste text, or select your target file from your local device storage.
+            </p>
           </div>
-          <div style={{ padding: '0.85rem', borderRadius: '8px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-main)' }}>
-            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--accent)', display: 'block', marginBottom: '0.2rem' }}>STEP 2</span>
-            <span style={{ fontSize: '0.85rem', color: 'var(--text-primary)', fontWeight: 600 }}>Adjust Options</span>
-            <p style={{ fontSize: '0.78rem', color: 'var(--text-tertiary)', marginTop: '0.2rem' }}>Customize settings, dimensions, quality sliders, or formats.</p>
+          <div style={{ padding: '1rem', borderRadius: '10px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-main)' }}>
+            <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--accent)', display: 'block', marginBottom: '0.3rem' }}>STEP 2</span>
+            <span style={{ fontSize: '0.88rem', color: 'var(--text-primary)', fontWeight: 700 }}>Configure Parameters</span>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-tertiary)', marginTop: '0.35rem', lineHeight: 1.5 }}>
+              Customize options, target dimensions, compression ratios, quality presets, or encryption keys.
+            </p>
           </div>
-          <div style={{ padding: '0.85rem', borderRadius: '8px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-main)' }}>
-            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--accent)', display: 'block', marginBottom: '0.2rem' }}>STEP 3</span>
-            <span style={{ fontSize: '0.85rem', color: 'var(--text-primary)', fontWeight: 600 }}>Instant Processing</span>
-            <p style={{ fontSize: '0.78rem', color: 'var(--text-tertiary)', marginTop: '0.2rem' }}>Our client-side engine executes instant conversion on your CPU.</p>
+          <div style={{ padding: '1rem', borderRadius: '10px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-main)' }}>
+            <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--accent)', display: 'block', marginBottom: '0.3rem' }}>STEP 3</span>
+            <span style={{ fontSize: '0.88rem', color: 'var(--text-primary)', fontWeight: 700 }}>Client-Side Execution</span>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-tertiary)', marginTop: '0.35rem', lineHeight: 1.5 }}>
+              Your device CPU processes the file in memory using native HTML5, WebAssembly, and Canvas APIs.
+            </p>
           </div>
-          <div style={{ padding: '0.85rem', borderRadius: '8px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-main)' }}>
-            <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--accent)', display: 'block', marginBottom: '0.2rem' }}>STEP 4</span>
-            <span style={{ fontSize: '0.85rem', color: 'var(--text-primary)', fontWeight: 600 }}>Download Result</span>
-            <p style={{ fontSize: '0.78rem', color: 'var(--text-tertiary)', marginTop: '0.2rem' }}>Download your processed file instantly without waiting.</p>
+          <div style={{ padding: '1rem', borderRadius: '10px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-main)' }}>
+            <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--accent)', display: 'block', marginBottom: '0.3rem' }}>STEP 4</span>
+            <span style={{ fontSize: '0.88rem', color: 'var(--text-primary)', fontWeight: 700 }}>Download Result</span>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-tertiary)', marginTop: '0.35rem', lineHeight: 1.5 }}>
+              Save your converted, compressed, or generated file immediately without waiting for server queues.
+            </p>
           </div>
+        </div>
+
+        {/* Technical Architecture & Specifications Section */}
+        <h3 style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <Cpu size={18} color="var(--accent)" /> Technical Architecture & Privacy Standards
+        </h3>
+        <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: 1.7, marginBottom: '1.25rem' }}>
+          ToolHero operates on a zero-upload security model. By taking advantage of modern browser capabilities—including the HTML5 File API, Web Workers for multi-threaded processing, and hardware-accelerated Canvas2D pipelines—files are parsed directly in your device RAM. No intermediate files are written to remote disks, preventing server data leakage and eliminating network latency.
+        </p>
+
+        {/* Technical Specs Table */}
+        <div style={{ overflowX: 'auto', marginBottom: '2rem' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.84rem' }}>
+            <thead>
+              <tr style={{ background: 'var(--bg-card)', borderBottom: '2px solid var(--border-main)' }}>
+                <th style={{ padding: '0.65rem 0.85rem', textAlign: 'left', fontWeight: 700 }}>Specification</th>
+                <th style={{ padding: '0.65rem 0.85rem', textAlign: 'left', fontWeight: 700 }}>Details</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style={{ borderBottom: '1px solid var(--border-main)' }}>
+                <td style={{ padding: '0.65rem 0.85rem', fontWeight: 600, color: 'var(--text-primary)' }}>Processing Engine</td>
+                <td style={{ padding: '0.65rem 0.85rem', color: 'var(--text-secondary)' }}>100% Client-Side In-Memory (JavaScript / HTML5 Web APIs)</td>
+              </tr>
+              <tr style={{ borderBottom: '1px solid var(--border-main)' }}>
+                <td style={{ padding: '0.65rem 0.85rem', fontWeight: 600, color: 'var(--text-primary)' }}>Data Privacy Level</td>
+                <td style={{ padding: '0.65rem 0.85rem', color: 'var(--text-secondary)' }}>Zero Server Exposure — No logs, no telemetry, no cloud storage</td>
+              </tr>
+              <tr style={{ borderBottom: '1px solid var(--border-main)' }}>
+                <td style={{ padding: '0.65rem 0.85rem', fontWeight: 600, color: 'var(--text-primary)' }}>Supported Platforms</td>
+                <td style={{ padding: '0.65rem 0.85rem', color: 'var(--text-secondary)' }}>Chrome, Safari, Firefox, Edge, Android & iOS Mobile Browsers</td>
+              </tr>
+              <tr style={{ borderBottom: '1px solid var(--border-main)' }}>
+                <td style={{ padding: '0.65rem 0.85rem', fontWeight: 600, color: 'var(--text-primary)' }}>Compliance Standards</td>
+                <td style={{ padding: '0.65rem 0.85rem', color: 'var(--text-secondary)' }}>GDPR, CCPA & HIPAA friendly (data never crosses external boundaries)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        {/* Pro Tips & Best Practices Box */}
+        <div style={{
+          padding: '1.25rem',
+          backgroundColor: 'var(--bg-card)',
+          borderRadius: '10px',
+          borderLeft: '4px solid #3b82f6',
+          marginBottom: '2rem'
+        }}>
+          <h4 style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <Lightbulb size={16} color="#3b82f6" /> Professional Best Practices
+          </h4>
+          <ul style={{ margin: 0, paddingLeft: '1.25rem', fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: 1.65 }}>
+            <li><strong>Preserve Master Copies:</strong> Always keep a copy of your original high-resolution files before applying aggressive lossy compression.</li>
+            <li><strong>Batch Processing Efficiency:</strong> Because computations run on your CPU, closing heavy background browser tabs will noticeably accelerate processing on large multi-megabyte files.</li>
+            <li><strong>Mobile & Desktop Parity:</strong> ToolHero is fully responsive and touch-friendly, allowing you to edit and convert files directly on smartphones without installing separate third-party apps.</li>
+          </ul>
         </div>
 
         {/* Security Feature Grid */}
@@ -539,7 +688,8 @@ function ToolPage({ catId, toolId, navigate }) {
         </section>
       )}
 
-      <div style={{ marginTop: '2rem' }}>
+      {/* Compliant In-Article Bottom Ad Slot */}
+      <div style={{ marginTop: '2.5rem' }}>
         <AdBanner slotType="leaderboard" />
       </div>
     </div>

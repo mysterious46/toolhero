@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Upload, Download, Grid, RefreshCw, UserCheck, Check } from 'lucide-react';
-import AdBanner from '../components/AdBanner';
 
 /* ─── Passport Standards Presets ─── */
 const PASSPORT_PRESETS = [
@@ -144,7 +143,6 @@ export default function PassportPhotoGenerator() {
 
   if (!src) return (
     <div>
-      <AdBanner slotType="leaderboard" />
       <div className="dropzone" onDragOver={e => e.preventDefault()} onDrop={e => { e.preventDefault(); if (e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]); }} onClick={() => fileInputRef.current?.click()}>
         <input type="file" ref={fileInputRef} onChange={e => loadFile(e.target.files[0])} accept="image/*" hidden />
         <div className="dropzone-icon"><UserCheck size={24} /></div>
@@ -157,7 +155,6 @@ export default function PassportPhotoGenerator() {
 
   return (
     <div>
-      <AdBanner slotType="leaderboard" />
 
       {/* Preset Country & Standard Selection */}
       <div style={{ background: 'var(--bg-elevated)', padding: '1.15rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-main)', marginBottom: '1.25rem' }}>

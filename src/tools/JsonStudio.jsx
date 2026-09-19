@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Code, Copy, Check, AlertCircle } from 'lucide-react';
-import AdBanner from '../components/AdBanner';
 
 export default function JsonStudio() {
   const [jsonInput, setJsonInput] = useState(`{\n  "name": "iLoveTools",\n  "version": 1.0,\n  "features": ["Favicon", "Compressor", "PDF", "QR", "JSON"],\n  "isPrivacyFirst": true\n}`);
@@ -75,7 +74,6 @@ export default function JsonStudio() {
         </p>
       </div>
 
-      <AdBanner slotType="leaderboard" />
 
       {/* Toolbar */}
       <div style={{

@@ -1,6 +1,5 @@
 import React, { useState, useRef } from 'react';
 import { Film, Download, Zap, RefreshCw, Play } from 'lucide-react';
-import AdBanner from '../components/AdBanner';
 
 export default function VideoToGif() {
   const [file, setFile] = useState(null);
@@ -87,7 +86,6 @@ export default function VideoToGif() {
 
   return (
     <div>
-      <AdBanner slotType="leaderboard" />
 
       {/* Video Preview & Settings */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.25rem', marginBottom: '1.25rem' }}>

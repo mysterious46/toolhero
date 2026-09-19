@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { ArrowRightLeft, FileCode, Check, RefreshCw, Info } from 'lucide-react';
-import AdBanner from '../components/AdBanner';
 
 export default function DiffChecker() {
   const [text1, setText1] = useState('');
@@ -35,7 +34,6 @@ export default function DiffChecker() {
 
   return (
     <div>
-      <AdBanner slotType="leaderboard" />
 
       {/* Input Editors Grid */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1rem', marginBottom: '1.25rem' }}>

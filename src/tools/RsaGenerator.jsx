@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Key, Copy, Check, RefreshCw, Lock } from 'lucide-react';
-import AdBanner from '../components/AdBanner';
 
 export default function RsaGenerator() {
   const [modulusLength, setModulusLength] = useState(2048);
@@ -54,7 +53,6 @@ export default function RsaGenerator() {
 
   return (
     <div>
-      <AdBanner slotType="leaderboard" />
 
       {/* Options Header */}
       <div style={{ background: 'var(--bg-elevated)', padding: '1.15rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-main)', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem' }}>

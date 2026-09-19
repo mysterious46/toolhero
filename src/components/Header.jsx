@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FileText, Image, Sparkles, AlignLeft, Shield, Music, Search, Menu, X } from 'lucide-react';
+import { FileText, Image, Sparkles, AlignLeft, Shield, Music, Search, Menu, X, BookOpen } from 'lucide-react';
 import { CATEGORIES, getToolsByCategory } from '../toolsData';
 import SearchModal from './SearchModal';
 
@@ -93,6 +93,9 @@ export default function Header({ navigate, currentPath }) {
             </a>
             <a href="/other" className={`cat-pill cat-other ${catId === 'other' ? 'active' : ''}`} onClick={(e) => { e.preventDefault(); handleNavClick('/other'); }}>
               <Sparkles size={14} /> More
+            </a>
+            <a href="/guides" className={`cat-pill cat-guides ${catId === 'guides' ? 'active' : ''}`} style={{ borderColor: 'rgba(196, 93, 62, 0.4)', background: catId === 'guides' ? 'var(--accent)' : 'transparent', color: catId === 'guides' ? '#fff' : 'inherit' }} onClick={(e) => { e.preventDefault(); handleNavClick('/guides'); }}>
+              <BookOpen size={14} /> Guides
             </a>
           </div>
 

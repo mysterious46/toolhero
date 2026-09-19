@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Type, Copy, Check, RefreshCw } from 'lucide-react';
-import AdBanner from '../components/AdBanner';
 
 export default function CaseConverter() {
   const [text, setText] = useState('');
@@ -26,7 +25,6 @@ export default function CaseConverter() {
 
   return (
     <div>
-      <AdBanner slotType="leaderboard" />
 
       {/* Input Area */}
       <div style={{ marginBottom: '1.25rem' }}>

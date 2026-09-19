@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from 'react';
 import { Search, Hash, ShieldCheck, Copy, Check, Info, TrendingUp } from 'lucide-react';
-import AdBanner from '../components/AdBanner';
 
 /* ─── Hash Pattern Definitions ───
    Each pattern has:
@@ -106,7 +105,6 @@ export default function HashIdentifier() {
 
   return (
     <div>
-      <AdBanner slotType="leaderboard" />
 
       {/* Input Box */}
       <div style={{ background: 'var(--bg-elevated)', padding: '1.25rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-main)', marginBottom: '1.25rem' }}>

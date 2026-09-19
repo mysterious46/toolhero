@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Download, Copy, Check, Upload, X, ChevronDown, ChevronUp, Image as ImageIcon, Palette, Sliders, Type, Frame, MessageSquare } from 'lucide-react';
 import QRCodeStyling from 'qr-code-styling';
-import AdBanner from '../components/AdBanner';
 
 /* ─── Social Presets ─── */
 const PRESETS = [
@@ -932,7 +931,6 @@ export default function QrCodeStudio() {
             </div>
 
             {/* Sidebar Ad Unit */}
-            <AdBanner slotType="rectangle" label="Advertisement" />
 
           </div>
 

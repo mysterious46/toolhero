@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Key, ShieldCheck, Copy, Check, RefreshCw, Hash } from 'lucide-react';
-import AdBanner from '../components/AdBanner';
 
 export default function PasswordGenerator() {
   // Password state
@@ -81,7 +80,6 @@ export default function PasswordGenerator() {
 
   return (
     <div>
-      <AdBanner slotType="leaderboard" />
 
       {/* ──── Section 1: Strong Password Generator ──── */}
       <div style={{ background: 'var(--bg-elevated)', padding: '1.25rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-main)', marginBottom: '1.5rem' }}>

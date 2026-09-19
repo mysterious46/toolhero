@@ -18,6 +18,11 @@ export default function Footer({ navigate }) {
           <p className="footer-brand-desc">
             Free online tools for PDF, image, text, security, audio, video, and developer utilities. ToolHero processes everything in your browser — your files never leave your device.
           </p>
+          <div style={{ marginTop: '0.85rem' }}>
+            <a href="/guides" style={{ textDecoration: 'none', color: '#c45d3e', fontWeight: 700, fontSize: '0.85rem', display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }} onClick={(e) => { e.preventDefault(); navigate('/guides'); }}>
+              📚 Technical Guides & Tutorials &rarr;
+            </a>
+          </div>
         </div>
 
         {/* PDF Tools Column */}
@@ -98,6 +103,8 @@ export default function Footer({ navigate }) {
           <Lock size={12} /> <strong style={{ color: 'var(--text-secondary)' }}>Privacy First:</strong> Your files never leave your device. All processing is done locally.
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+          <a href="/guides" style={{ textDecoration: 'none', color: 'inherit', fontWeight: 600 }} onClick={(e) => { e.preventDefault(); navigate('/guides'); }}>Guides</a>
+          <span>|</span>
           <a href="/about" style={{ textDecoration: 'none', color: 'inherit', fontWeight: 600 }} onClick={(e) => { e.preventDefault(); navigate('/about'); }}>About Us</a>
           <span>|</span>
           <a href="/contact" style={{ textDecoration: 'none', color: 'inherit', fontWeight: 600 }} onClick={(e) => { e.preventDefault(); navigate('/contact'); }}>Contact Us</a>

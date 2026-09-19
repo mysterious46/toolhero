@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { ShieldCheck, ShieldAlert, Key, Check, X, AlertTriangle, Info } from 'lucide-react';
-import AdBanner from '../components/AdBanner';
 
 export default function PasswordAnalyzer() {
   const [pass, setPass] = useState('');
@@ -42,7 +41,6 @@ export default function PasswordAnalyzer() {
 
   return (
     <div>
-      <AdBanner slotType="leaderboard" />
 
       {/* Input Box */}
       <div style={{ background: 'var(--bg-elevated)', padding: '1.25rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-main)', marginBottom: '1.25rem' }}>

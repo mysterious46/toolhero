@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Network, Search, Check, Copy } from 'lucide-react';
-import AdBanner from '../components/AdBanner';
 
 export default function SubnetCalculator() {
   const [ip, setIp] = useState('192.168.1.100');
@@ -38,7 +37,6 @@ export default function SubnetCalculator() {
 
   return (
     <div>
-      <AdBanner slotType="leaderboard" />
 
       {/* Input Form */}
       <div style={{ background: 'var(--bg-elevated)', padding: '1.25rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-main)', marginBottom: '1.25rem' }}>

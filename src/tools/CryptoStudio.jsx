@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Lock, Unlock, Copy, Check, Shield, Code2 } from 'lucide-react';
-import AdBanner from '../components/AdBanner';
 
 export default function CryptoStudio() {
   const [activeTab, setActiveTab] = useState('aes'); // 'aes', 'base64', 'hex'
@@ -79,7 +78,6 @@ export default function CryptoStudio() {
 
   return (
     <div>
-      <AdBanner slotType="leaderboard" />
 
       {/* Tabs Header */}
       <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.25rem' }}>
