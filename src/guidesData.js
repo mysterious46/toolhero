@@ -94,6 +94,11 @@ You do not need to take any website's word for its privacy claims. You can verif
       { id: 'crypto-studio', cat: 'security', title: 'Crypto Studio' },
       { id: 'word-to-pdf', cat: 'pdf', title: 'Word to PDF' },
       { id: 'remove-bg', cat: 'image', title: 'Remove Background' }
+    ],
+    faqs: [
+      { q: 'How can I independently verify that ToolHero does not upload my files?', a: 'Open your browser Developer Tools (F12 or Cmd+Option+I), navigate to the Network tab, and process any document. You will observe exactly zero POST, PUT, or WebSocket data transmissions carrying your file contents.' },
+      { q: 'Do client-side tools work when my computer or phone is offline?', a: 'Yes! Once the initial webpage assets and scripts are loaded, client-side processing executes without needing an active internet connection.' },
+      { q: 'Can client-side tools handle large 50MB+ files without crashing?', a: 'Yes. Modern 64-bit browsers allocate gigabytes of heap memory to Web Workers and WebAssembly buffers, allowing you to process large files bounded only by your device physical RAM.' }
     ]
   },
   {
@@ -187,6 +192,11 @@ Lossless stream optimizations can be reversed, but lossy image downsampling perm
       { id: 'merge-pdf', cat: 'pdf', title: 'Merge PDF' },
       { id: 'split-pdf', cat: 'pdf', title: 'Split PDF' },
       { id: 'word-to-pdf', cat: 'pdf', title: 'Word to PDF' }
+    ],
+    faqs: [
+      { q: 'What is the difference between lossless and lossy PDF compression?', a: 'Lossless PDF compression optimizes text streams, vector paths, and metadata tables without altering a single pixel. Lossy compression downsamples high-resolution embedded raster photographs and re-encodes DCT streams at calibrated quality levels.' },
+      { q: 'Why did my compressed PDF barely reduce in file size?', a: 'If your PDF already contains pre-optimized, highly compressed JPEG images and lacks redundant embedded font subsets or uncompressed streams, additional compression cannot yield significant reductions without degrading visual clarity.' },
+      { q: 'Are vector graphics and text sharpness affected by PDF compression?', a: 'No. Vector fonts and mathematical curve paths retain full crispness at any zoom level. Only embedded raster photographs are resized.' }
     ]
   },
   {
@@ -276,7 +286,12 @@ We evaluated a 2400x1600 natural photograph across all four raster formats:
       { id: 'convert-format', cat: 'image', title: 'Convert Image Format' },
       { id: 'compress-image', cat: 'image', title: 'Compress Image' },
       { id: 'resize-image', cat: 'image', title: 'Resize Image' },
-      { id: 'remove-bg', cat: 'image', title: 'Remove Background' }
+      { id: 'favicon-generator', cat: 'image', title: 'Favicon Generator' }
+    ],
+    faqs: [
+      { q: 'Does WebP support transparent backgrounds like PNG?', a: 'Yes! WebP fully supports 8-bit alpha channel transparency in both lossy and lossless modes, typically at 30% to 50% smaller file sizes than PNG-24.' },
+      { q: 'Will converting a JPEG to PNG make the image sharper?', a: 'No. Converting an already lossy JPEG into a PNG only increases the file size without restoring discarded high-frequency details. Once image data is lost during JPEG compression, it cannot be reconstructed.' },
+      { q: 'Are modern browsers fully compatible with WebP images?', a: 'Yes, WebP is supported across all major contemporary web browsers including Google Chrome, Mozilla Firefox, Apple Safari (iOS 14+ / macOS Big Sur+), Microsoft Edge, and Opera.' }
     ]
   },
   {
@@ -376,6 +391,11 @@ ToolHero's **Crypto Studio**, **Hash Identifier**, and **RSA Key Generator** lev
       { id: 'hash-identifier', cat: 'security', title: 'Hash Identifier' },
       { id: 'rsa-generator', cat: 'security', title: 'RSA Key Generator' },
       { id: 'jwt-decoder', cat: 'security', title: 'JWT Decoder' }
+    ],
+    faqs: [
+      { q: 'What is the primary difference between hashing and encryption?', a: 'Hashing is a one-way mathematical function designed for integrity verification or password storage (you cannot reverse a hash back to its input). Encryption is a two-way transformation requiring a secret key to decrypt back into original plaintext.' },
+      { q: 'Why should a cryptographic salt always be used when hashing passwords?', a: 'A unique cryptographic salt ensures that identical passwords yield completely different hashes, neutralizing precomputed rainbow table attacks and bulk hash lookup collisions.' },
+      { q: 'Why is AES-GCM preferred over AES-CBC in modern web applications?', a: 'AES-GCM provides authenticated encryption (AEAD), which guarantees both confidentiality and ciphertext integrity. This prevents padding oracle attacks and bit-flipping tampering that plague unauthenticated CBC mode.' }
     ]
   },
   {
@@ -473,6 +493,11 @@ Ensure your export matches standard international paper formats:
       { id: 'pdf-to-word', cat: 'pdf', title: 'PDF to Word Converter' },
       { id: 'compress-pdf', cat: 'pdf', title: 'Compress PDF' },
       { id: 'merge-pdf', cat: 'pdf', title: 'Merge PDF' }
+    ],
+    faqs: [
+      { q: 'Why do online converters sometimes change Word document fonts?', a: 'If a DOCX document uses proprietary or local operating system fonts not available in the web browser environment, the rendering engine substitutes standard web-safe fallback fonts (such as Arial or Times New Roman).' },
+      { q: 'How does ToolHero convert Word documents to PDF without a server?', a: 'ToolHero unzips the .docx archive using JSZip, parses document XML styling via docx-preview directly into a sanitized browser DOM, and compiles high-DPI canvas renderings into a multi-page PDF using jsPDF.' },
+      { q: 'Will Word tables, borders, and margins render accurately?', a: 'Yes! Modern client-side OpenXML parsers accurately calculate column widths, borders, page margins, and inline image dimensions to reproduce print-accurate PDF documents.' }
     ]
   }
 ];

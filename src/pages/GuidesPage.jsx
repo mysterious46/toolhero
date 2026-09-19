@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { BookOpen, Clock, Calendar, ArrowLeft, ArrowRight, ShieldCheck, CheckCircle2, Share2, Sparkles, Layers } from 'lucide-react';
 import { GUIDES, getGuideBySlug } from '../guidesData';
 import AdBanner from '../components/AdBanner';
+import FaqSection from '../components/FaqSection';
 
 export function GuidesIndexPage({ navigate }) {
   const [selectedCat, setSelectedCat] = useState('all');
@@ -125,6 +126,25 @@ export function GuidesIndexPage({ navigate }) {
           </article>
         ))}
       </div>
+
+      {/* Guides Hub FAQ Section */}
+      <FaqSection
+        title="Technical Guides & Research FAQ"
+        faqs={[
+          {
+            q: 'Why does ToolHero publish in-depth technical guides?',
+            a: 'We believe in full transparency and architectural education. Understanding how WebAssembly, memory garbage collection, and client-side encryption work gives users confidence that their confidential documents never leave their device.'
+          },
+          {
+            q: 'Are the tools described in these guides free to use?',
+            a: 'Yes! All 38+ browser tools referenced across our guides are 100% free with no registration, daily limits, or subscriptions.'
+          },
+          {
+            q: 'How are file conversion benchmarks and fidelity measured?',
+            a: 'Our engineering team tests against standardized ISO and W3C test documents, evaluating visual fidelity, font glyph metric parity, memory consumption, and execution speed across modern Chromium, Gecko, and WebKit engines.'
+          }
+        ]}
+      />
 
       {/* Compliant In-Article Bottom Ad Slot */}
       <div style={{ marginTop: '2rem' }}>
@@ -370,6 +390,11 @@ export function GuideDetailPage({ slug, navigate }) {
       <div className="guide-content-body" style={{ marginBottom: '3.5rem' }}>
         {renderMarkdown(guide.content)}
       </div>
+
+      {/* Guide-Specific Frequently Asked Questions */}
+      {guide.faqs && guide.faqs.length > 0 && (
+        <FaqSection faqs={guide.faqs} title="Frequently Asked Questions" />
+      )}
 
       {/* Compliant In-Article Bottom Ad Slot */}
       <div style={{ margin: '2.5rem 0' }}>

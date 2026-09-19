@@ -144,6 +144,38 @@ export const SEO_DATA = {
     ]
   },
 
+  // Word to PDF
+  '/pdf/word-to-pdf': {
+    title: 'Word to PDF Converter Online Free – Convert DOCX to PDF | ToolHero',
+    description: 'Convert Microsoft Word (.docx) documents to PDF online for free. High-fidelity rendering with preserved tables, styling, and images. 100% private in-browser conversion.',
+    h1: 'Convert Word to PDF Online',
+    subtitle: 'Transform DOCX documents into publication-ready PDF files instantly without uploading your files to any remote server.',
+    primaryKeyword: 'word to pdf online free',
+    secondaryKeywords: 'convert docx to pdf, word document to pdf, high quality word to pdf',
+    faqs: [
+      { q: 'How does in-browser Word to PDF conversion work without a server?', a: 'ToolHero parses the underlying OpenXML package of your .docx file using client-side JavaScript, renders each page into an isolated DOM container, and captures it into vector-grade PDF pages via HTML5 canvas and jsPDF directly inside your browser.' },
+      { q: 'Are my confidential Word documents kept private?', a: 'Yes, 100%. Unlike conventional online converters that upload your Word document to an unknown remote cloud server, ToolHero processes everything locally inside your device memory. No document data is ever transmitted across the internet.' },
+      { q: 'Will tables, embedded images, and custom fonts be preserved?', a: 'Yes! ToolHero accurately renders Word tables, cell borders, text alignments, bulleted lists, and embedded JPEG/PNG images with high fidelity at 2x device pixel ratio for crisp, legible text.' },
+      { q: 'Is there a limit on file size or number of pages?', a: 'Because memory allocation is handled directly by your web browser, you can convert multi-page documents without arbitrary server file-size or page caps.' }
+    ]
+  },
+
+  // PDF to Word
+  '/pdf/pdf-to-word': {
+    title: 'PDF to Word Converter Online Free – Convert PDF to DOCX | ToolHero',
+    description: 'Convert PDF files into editable Microsoft Word (.docx) documents online for free. Extracts text, paragraphs, and formatting securely in your browser.',
+    h1: 'Convert PDF to Word Online',
+    subtitle: 'Turn PDF documents into fully editable DOCX Word files right in your browser with zero server uploads.',
+    primaryKeyword: 'pdf to word converter free',
+    secondaryKeywords: 'convert pdf to docx, editable word from pdf, extract pdf to word',
+    faqs: [
+      { q: 'Can I edit the converted Word document in Microsoft Word or Google Docs?', a: 'Yes! The exported file is standard Microsoft Word (.docx) format that opens seamlessly in Microsoft Word, Google Docs, Apple Pages, and LibreOffice with editable text and paragraphs.' },
+      { q: 'Are my converted PDF files secure?', a: 'Your documents never leave your computer or phone. All text extraction and OpenXML document generation execute locally in your browser.' },
+      { q: 'How does it handle multi-column layouts and line breaks?', a: 'Our parser analyzes text coordinates across each PDF page to reconstruct natural paragraphs, headings, and margins rather than outputting broken text fragments.' },
+      { q: 'Do I have to pay or create an account for converting large PDFs?', a: 'No. ToolHero is completely free with no registration, subscription, credit card requirement, or usage caps.' }
+    ]
+  },
+
   // 12. Image Category
   '/image': {
     title: 'Free Online Image Tools – Compress, Resize, Convert & Edit | ToolHero',
@@ -270,6 +302,49 @@ export const SEO_DATA = {
     secondaryKeywords: 'extract colors from image, Hex color code finder, image color picker',
     faqs: [
       { q: 'Can I copy Hex color codes with one click?', a: 'Yes! Click any color swatch to copy its exact Hex code (#RRGGBB) to your clipboard.' }
+    ]
+  },
+
+  // Rotate & Flip Image
+  '/image/rotate-flip': {
+    title: 'Rotate and Flip Image Online Free – ToolHero',
+    description: 'Rotate images by 90, 180, or 270 degrees and flip horizontally or vertically online for free. Fast, lossless in-browser photo orientation tool.',
+    h1: 'Rotate & Flip Image Online',
+    subtitle: 'Fix sideways or upside-down photos with instant 90° rotations and mirror flips.',
+    primaryKeyword: 'rotate image online free',
+    secondaryKeywords: 'flip photo horizontally, turn picture 90 degrees, mirror image online',
+    faqs: [
+      { q: 'Does rotating reduce the visual quality of my image?', a: 'No, rotation and flipping are performed on HTML5 canvas buffers preserving full source pixel quality and colors.' },
+      { q: 'Can I flip an image horizontally and vertically simultaneously?', a: 'Yes, you can combine horizontal mirror flips, vertical flips, and multiple 90-degree rotations in a single operation.' },
+      { q: 'What image formats can I rotate?', a: 'ToolHero supports JPG, PNG, WebP, GIF, and AVIF image formats.' }
+    ]
+  },
+
+  // Watermark Image
+  '/image/watermark-image': {
+    title: 'Add Watermark to Image Online Free – ToolHero',
+    description: 'Protect your photos and artwork by adding customizable text or logo watermarks online for free directly in your browser.',
+    h1: 'Watermark Image Online',
+    subtitle: 'Add custom copyright text or logos with adjustable opacity, position, and font size.',
+    primaryKeyword: 'watermark photo online free',
+    secondaryKeywords: 'add copyright to photo, protect image watermark, text on image online',
+    faqs: [
+      { q: 'Can I adjust the opacity and positioning of my watermark?', a: 'Yes, customize font size, color, opacity, angle, and 9-point grid positioning to place your watermark exactly where you want it.' },
+      { q: 'Is my original photo altered or overwritten?', a: 'No, your original file remains untouched. The watermarked image is saved as a new download to your local device.' }
+    ]
+  },
+
+  // Blur Image
+  '/image/blur-image': {
+    title: 'Blur Image Online Free – Selective and Full Image Blurring | ToolHero',
+    description: 'Blur faces, private data, sensitive details, or create aesthetic soft-focus backgrounds online for free without uploading photos.',
+    h1: 'Blur Image Online',
+    subtitle: 'Protect sensitive information, hide faces, or soften backgrounds with adjustable blur radius.',
+    primaryKeyword: 'blur image online free',
+    secondaryKeywords: 'censor photo online, blur sensitive data, defocus background photo',
+    faqs: [
+      { q: 'Can I control the blur intensity?', a: 'Yes! Use the slider to smoothly increase or decrease the Gaussian blur radius from subtle softening to heavy censorship.' },
+      { q: 'Does anyone else see my blurred or sensitive photos?', a: 'Never. All canvas operations execute locally in your browser memory. Your sensitive files never travel across any network.' }
     ]
   },
 
@@ -536,5 +611,17 @@ export const SEO_DATA = {
     title: 'Terms of Service – ToolHero',
     description: 'ToolHero terms of service for tool usage.',
     h1: 'Terms of Service'
+  },
+  '/guides': {
+    title: 'Technical Guides, Web Standards & Security Tutorials | ToolHero',
+    description: 'Explore in-depth technical guides and tutorials on client-side browser privacy, PDF compression internals, image formats, cryptography, and document conversion.',
+    h1: 'ToolHero Technical Guides & Tutorials',
+    subtitle: 'Engineering deep dives, format specifications, performance benchmarks, and privacy architecture guides written by the ToolHero team.',
+    keywords: 'web development guides, client side privacy, pdf compression explained, web cryptography tutorial, image format comparisons',
+    faqs: [
+      { q: 'Why does ToolHero publish technical guides?', a: 'We believe transparency is key to trust. Our technical guides provide comprehensive explanations of browser APIs (WebAssembly, Web Crypto, Canvas) so developers and users understand how client-side privacy actually works.' },
+      { q: 'Are the tools and techniques explained in these guides open to everyone?', a: 'Yes. All guides explain open web standards (W3C, IETF, ISO 32000-1) and modern web specifications that you can inspect and verify in your own browser dev tools.' },
+      { q: 'How often are new tutorials and technical articles added?', a: 'Our engineering team regularly publishes updates whenever new browser APIs, compression algorithms, or web cryptography standards are adopted.' }
+    ]
   }
 };

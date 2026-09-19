@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import AdBanner from './components/AdBanner';
+import FaqSection from './components/FaqSection';
 import { CATEGORIES, TOOLS, getToolsByCategory, getToolById, getCategoryById } from './toolsData';
 import { SEO_DATA } from './seoData';
 import { ShieldCheck, Zap, Lock, ArrowLeft, FileText, Image, Sparkles, AlignLeft, Shield, Music, CheckCircle2, HelpCircle, ChevronDown, ChevronUp, Layers, ArrowRight, BookOpen, Cpu, Lightbulb } from 'lucide-react';
@@ -498,6 +499,24 @@ function ToolPage({ catId, toolId, navigate }) {
 
   const ToolComponent = tool.component;
   const siblingTools = getToolsByCategory(catId).filter(t => t.id !== toolId);
+  const toolFaqs = (seo.faqs && seo.faqs.length > 0) ? seo.faqs : [
+    {
+      q: `Is ${tool?.title || 'this tool'} free to use?`,
+      a: `Yes! ${tool?.title || 'ToolHero'} is 100% free with no subscriptions, usage limits, or hidden fees.`
+    },
+    {
+      q: `Does ${tool?.title || 'this tool'} upload my files to any remote server?`,
+      a: `No. All operations run strictly inside your web browser using HTML5 and client-side memory buffers. Your files never leave your device.`
+    },
+    {
+      q: `What is the maximum file size supported?`,
+      a: `Because execution is handled locally by your browser rather than a remote cloud server, file size limits are bounded only by your device's available RAM.`
+    },
+    {
+      q: `Can I use ${tool?.title || 'this tool'} on mobile devices?`,
+      a: `Yes! ToolHero is fully responsive and functions smoothly across Chrome, Safari, Edge, and Firefox on desktop, tablet, and mobile smartphones.`
+    }
+  ];
 
   return (
     <div className="tool-workspace">
@@ -652,7 +671,7 @@ function ToolPage({ catId, toolId, navigate }) {
       </section>
 
       {/* FAQ Component */}
-      {seo.faqs && <FaqSection faqs={seo.faqs} />}
+      <FaqSection faqs={toolFaqs} />
 
       {/* Internal Linking Related Tools Cluster */}
       {siblingTools.length > 0 && (
@@ -693,64 +712,6 @@ function ToolPage({ catId, toolId, navigate }) {
         <AdBanner slotType="leaderboard" />
       </div>
     </div>
-  );
-}
-
-/* ─────────── Interactive FAQ Accordion Component ─────────── */
-function FaqSection({ faqs }) {
-  const [openIndex, setOpenIndex] = useState(0);
-
-  if (!faqs || faqs.length === 0) return null;
-
-  return (
-    <section style={{ marginTop: '3rem' }}>
-      <h2 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-        <HelpCircle size={18} color="#a855f7" /> Frequently Asked Questions
-      </h2>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-        {faqs.map((f, i) => {
-          const isOpen = openIndex === i;
-          return (
-            <div
-              key={i}
-              style={{
-                borderRadius: '8px',
-                border: '1px solid var(--border-main)',
-                backgroundColor: 'var(--bg-elevated)',
-                overflow: 'hidden',
-                transition: 'all 0.2s ease'
-              }}
-            >
-              <button
-                style={{
-                  width: '100%',
-                  padding: '1rem 1.25rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  background: 'none',
-                  border: 'none',
-                  color: 'var(--text-primary)',
-                  fontWeight: 600,
-                  fontSize: '0.92rem',
-                  textAlign: 'left',
-                  cursor: 'pointer'
-                }}
-                onClick={() => setOpenIndex(isOpen ? -1 : i)}
-              >
-                <span>{f.q}</span>
-                {isOpen ? <ChevronUp size={16} color="var(--text-tertiary)" /> : <ChevronDown size={16} color="var(--text-tertiary)" />}
-              </button>
-              {isOpen && (
-                <div style={{ padding: '0 1.25rem 1rem 1.25rem', fontSize: '0.86rem', color: 'var(--text-secondary)', lineHeight: 1.6, borderTop: '1px solid var(--border-main)', paddingTop: '0.75rem' }}>
-                  {f.a}
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
-    </section>
   );
 }
 
